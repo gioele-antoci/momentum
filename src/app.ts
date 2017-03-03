@@ -14,6 +14,7 @@ let comments: comment[] = [];
 
 let authUser: user;
 
+let pageRoot: JQuery;
 let anonRoot: JQuery;
 let authRoot: JQuery;
 
@@ -35,17 +36,24 @@ let photoImage: JQuery;
 let morePhotoButton: JQuery;
 let photoContainer: JQuery;
 
-let albumTops = 10;
+let albumTops = 3;
 let albumSkip = 0;
 
 let photoTops = 5;
 let photoSkip = 0;
 
 const setup = () => {
+    pageRoot = $(".root");
     anonRoot = $(".anon-root");
     authRoot = $(".auth-root");
     const form = $(".login-form");
     const input = $(".login-input");
+    const logoutButton = $(".logout");
+
+    logoutButton.click(e => {
+        localStorage.removeItem("user");
+        logout();
+    });
 
     dialog.setupDialog();
 
@@ -137,12 +145,14 @@ class dialog {
     };
 
     static openDialog = () => {
+        pageRoot.addClass("dialog-open");
         dialog.dialogEl.removeClass("hidden");
         dialog.textarea.focusin().select();
     };
 
     static closeDialog = () => {
         dialog.dialogEl.addClass("hidden");
+        pageRoot.removeClass("dialog-open");
     };
 
     static renderComments = (postId: number) => {
@@ -194,6 +204,11 @@ const login = (username: string) => {
     }
 };
 
+const logout = () => {
+    anonRoot.removeClass("hidden");
+    authRoot.addClass("hidden");
+};
+
 const changeUser = (user: user) => {
     if (user) {
         //reset
@@ -202,7 +217,7 @@ const changeUser = (user: user) => {
 
         switcher.val(user.id);
 
-        authRoot.addClass("disable");
+        pageRoot.addClass("disable");
 
         //get albums
         const promiseAlbums = $.getJSON(`${root}albums?userId=${user.id}`);
@@ -228,7 +243,7 @@ const changeUser = (user: user) => {
             renderPosts();
         });
 
-        $.when(promisePosts, promiseAlbums, promisePosts).done(() => authRoot.removeClass("disable"));
+        $.when(promisePosts, promiseAlbums, promisePosts).done(() => pageRoot.removeClass("disable"));
     }
 };
 

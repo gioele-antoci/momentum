@@ -11,6 +11,18 @@ body {
     font-size: 1em;
 }
 
+.auth-root {
+    position: absolute;
+    top: 6em;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.anon-root-internal {
+    padding-top: 6em;
+}
+
 .dialog {
     position: absolute;
     top: 0;
@@ -29,6 +41,7 @@ body {
     left: 5%;
     bottom: 5%;
     right: 5%;
+    overflow-y: auto;
 }
 
 .root {
@@ -36,7 +49,15 @@ body {
 }
 
 .logo {
-    font-size: 5em;
+    font-size: 3em;
+    position: absolute;
+    top: .5em;
+    width: 100%;
+}
+
+.login-form button {
+    display: block;
+    margin: 1em auto;
 }
 
 .auth-root {
@@ -100,4 +121,70 @@ body {
 
 .users .label {
     margin-bottom: .5em;
+}
+
+.post-comments-button {
+    margin-top: 1em;
+}
+
+.more-albums {
+    margin: 3em 0;
+}
+
+.users .label {
+    margin-bottom: .5em;
+}
+
+.post-comment {
+    display: block;
+    margin: .5em auto 2em auto;
+}
+
+.comment {
+    padding: 1em;
+    margin: 1em;
+    border: 1px solid lightgray;
+    text-align: left;
+    word-wrap: break-word;
+}
+
+.comment-author:before {
+    content: "Author's email: ";
+    font-weight: bold;
+}
+
+.comment-body:before {
+    content: "Comment: ";
+    font-weight: bold;
+}
+
+.root.dialog-open .auth-root {
+    display: none;
+}
+
+.close-dialog {
+    position: absolute;
+    top: 1%;
+    right: 1%;
+    font-size: 1.5em;
+    border-radius: 50%;
+    background: white;
+    border: 1px solid;
+    padding: .5em;
+    line-height: .5em;
+}
+
+.close-dialog:hover, button:hover {
+    cursor: pointer;
+    background: lightblue;
+}
+
+.comment-textarea {
+    width: 50%;
+    min-height: 10%;
+}
+
+.logout {
+    display: block;
+    margin: .5em auto;
 }

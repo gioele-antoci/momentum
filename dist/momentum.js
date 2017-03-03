@@ -6,6 +6,7 @@ var albums = [];
 var photos = [];
 var comments = [];
 var authUser;
+var pageRoot;
 var anonRoot;
 var authRoot;
 var switcher;
@@ -22,15 +23,21 @@ var photoEl;
 var photoImage;
 var morePhotoButton;
 var photoContainer;
-var albumTops = 10;
+var albumTops = 3;
 var albumSkip = 0;
 var photoTops = 5;
 var photoSkip = 0;
 var setup = function () {
+    pageRoot = $(".root");
     anonRoot = $(".anon-root");
     authRoot = $(".auth-root");
     var form = $(".login-form");
     var input = $(".login-input");
+    var logoutButton = $(".logout");
+    logoutButton.click(function (e) {
+        localStorage.removeItem("user");
+        logout();
+    });
     dialog.setupDialog();
     form.on("submit", function (e) {
         e.preventDefault();
@@ -101,11 +108,13 @@ dialog.setupDialog = function () {
     });
 };
 dialog.openDialog = function () {
+    pageRoot.addClass("dialog-open");
     dialog.dialogEl.removeClass("hidden");
     dialog.textarea.focusin().select();
 };
 dialog.closeDialog = function () {
     dialog.dialogEl.addClass("hidden");
+    pageRoot.removeClass("dialog-open");
 };
 dialog.renderComments = function (postId) {
     //comments
@@ -147,13 +156,17 @@ var login = function (username) {
         }
     }
 };
+var logout = function () {
+    anonRoot.removeClass("hidden");
+    authRoot.addClass("hidden");
+};
 var changeUser = function (user) {
     if (user) {
         //reset
         albumSkip = 0;
         photoSkip = 0;
         switcher.val(user.id);
-        authRoot.addClass("disable");
+        pageRoot.addClass("disable");
         //get albums
         var promiseAlbums = $.getJSON(root + "albums?userId=" + user.id);
         var promisePhotos_1;
@@ -175,7 +188,7 @@ var changeUser = function (user) {
             posts = data;
             renderPosts();
         });
-        $.when(promisePosts, promiseAlbums, promisePosts).done(function () { return authRoot.removeClass("disable"); });
+        $.when(promisePosts, promiseAlbums, promisePosts).done(function () { return pageRoot.removeClass("disable"); });
     }
 };
 var renderAlbums = function () {

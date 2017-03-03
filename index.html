@@ -25,16 +25,19 @@
     <div class="root">
         <div class="logo">momentum</div>
         <div class="anon-root">
-            <form class="login-form">
-                <input type="text" class="login-input" placeholder="Enter your username" />
-                <button type="submit">Login</button>
-            </form>
+            <div class="anon-root-internal">
+                    <form class="login-form">
+                        <input type="text" class="login-input" placeholder="Enter your username" />
+                        <button type="submit">Login</button>
+                    </form>
+            </div>
         </div>
 
         <div class="auth-root hidden">
             <div class="users">
                 <div class="label">Users</div>
                 <select class="user-switcher"></select>
+                <button class="logout" type="submit">Logout</button>
             </div>
 
             <div class="label">Posts</div>
@@ -58,20 +61,20 @@
                 </div>
             </div>
             <button class="more-albums">More albums</button>
-            <div class="dialog hidden">
-                <div class="inner-dialog">
-                    <div class="label">Comments</div>
-                    <textarea class="comment-textarea"></textarea>
-                    <button class="post-comment">Post</button>
+        </div>
+        <div class="dialog hidden">
+            <div class="inner-dialog">
+                <div class="label">Comments</div>
+                <textarea class="comment-textarea"></textarea>
+                <button class="post-comment">Post</button>
 
-                    <div class="comment-container">
-                        <div class="comment">
-                            <div class="comment-author"></div>
-                            <div class="comment-body"></div>
-                        </div>
+                <div class="comment-container">
+                    <div class="comment">
+                        <div class="comment-author"></div>
+                        <div class="comment-body"></div>
                     </div>
-                    <button class="close-dialog">Close</button>
                 </div>
+                <button class="close-dialog">x</button>
             </div>
         </div>
     </div>
