@@ -1,5 +1,5 @@
 var _this = this;
-var root = "http://jsonplaceholder.typicode.com/";
+var root = "https://jsonplaceholder.typicode.com/";
 var users = [];
 var posts = [];
 var albums = [];

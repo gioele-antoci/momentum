@@ -1,4 +1,4 @@
-var root = `http://jsonplaceholder.typicode.com/`;
+var root = `https://jsonplaceholder.typicode.com/`;
 
 type album = { userId: number; id: number; title: string };
 type photo = { albumId: number; id: number; title: string; url: string; thumbnailUrl: string };
