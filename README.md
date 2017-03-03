@@ -3,7 +3,7 @@
 ### TL;DR ES3 can cause serious pain to whomever has to support it: [WEBSITE](https://gioele-antoci.github.io/momentum) 
 
 ## What I wanted to do
-Build a fast, clean, **react app**. I wanted to do this to showcase my skills with a recent, modern framework but also because it's what makes most sense. When I read the specifics on my way home I thought this was gonna take me a couple of hours. That was until I read the `es3` requirement.   
+Build a fast, clean, **react app**. I wanted to do this to showcase my skills with a recent, modern framework but also because it's what makes the most sense. When I read the specifics on my way home I thought this was gonna take me a couple of hours. That was until I read the `es3` requirement.   
 Naive me thought I could get away with workarounds. Namely `es5shims` + `es5shams` (more [here](https://github.com/es-shims/es5-shim)) . Or create a react app,take that bundle and pass it through a transpiler (Traceur? Babel?).    
 I KNEW NOTHING.   
 I started going down the rabbit hole, I was 1/2hs into it, the app scaffolding was more or less complete but I couldn't get it to work in IE8 (shims did not work as much as I wanted, this is somewhat expected).    
