@@ -26,4 +26,8 @@ The app is simple, can be refactored to be better but it works. I **made it work
 - Give feedback that informs the user the app is loading
 - Display who the current authenticated user is
 - Show full image on hover (only thumbnails are shown now)
-- Css improvs (I am sure I can come out with a way of using material design that gracefully degrade to IE8 )
+- Css improvs (I am sure I can come out with a way of using material design that gracefully degrade to IE8 )   
+  
+    
+      
+_memento audere semper_
