@@ -40,7 +40,6 @@ let albumTops = 3;
 let albumSkip = 0;
 
 let photoTops = 5;
-let photoSkip = 0;
 
 const setup = () => {
     pageRoot = $(".root");
@@ -213,8 +212,6 @@ const changeUser = (user: user) => {
     if (user) {
         //reset
         albumSkip = 0;
-        photoSkip = 0;
-
         switcher.val(user.id);
 
         pageRoot.addClass("disable");
@@ -262,7 +259,6 @@ const renderAlbums = () => {
 
         //attach scoped click handler 
         albumEl.append(morePhotoButton.clone().click((e) => ((el: JQuery, id: number) => {
-            photoSkip += photoTops;
             renderPhotos(el, id);
         })(photoCont, album.id)));
 
@@ -274,6 +270,8 @@ const renderAlbums = () => {
 const renderPhotos = (photoContainer: JQuery, albumId: number) => {
     const albumPhotos = photos.filter(x => x.albumId === albumId);
 
+    const photoSkip = photoContainer.children().length;
+    
     // let's not worry about tops/skips being higher than album's length
     //for each photo belonging to this album generate photo dom
     albumPhotos.slice(photoSkip, photoSkip + photoTops).forEach((albumPhoto: photo) => {
