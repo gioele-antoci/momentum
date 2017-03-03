@@ -19,7 +19,9 @@ let authRoot: JQuery;
 
 let switcher: JQuery;
 let postsEl: JQuery;
+
 let albumsContainer: JQuery;
+let moreAlbumsButton: JQuery;
 
 let postContainer: JQuery;
 let postTitle: JQuery;
@@ -30,9 +32,14 @@ let albumContainer: JQuery;
 let albumTitle: JQuery;
 let photoEl: JQuery;
 let photoImage: JQuery;
+let morePhotoButton: JQuery;
+let photoContainer: JQuery;
 
-let tops = 30;
-let skip = 0;
+let albumTops = 10;
+let albumSkip = 0;
+
+let photoTops = 5;
+let photoSkip = 0;
 
 const setup = () => {
     anonRoot = $(".anon-root");
@@ -63,8 +70,15 @@ const setup = () => {
 
     photoImage = $(".photo-image").detach();
     photoEl = $(".photo").detach();
+    morePhotoButton = $(".more-photos").detach();
+    photoContainer = $(".photo-container").detach();
     albumTitle = $(".album-title").detach();
     albumContainer = $(".album-container").detach();
+
+    moreAlbumsButton = $(".more-albums").click(e => {
+        albumSkip += albumTops;
+        renderAlbums();
+    });
 };
 
 const requestUsers = () => {
@@ -91,60 +105,91 @@ const login = (text) => {
 
 const changeUser = (user: user) => {
     if (user) {
+        //reset
+        albumSkip = 0;
+        photoSkip = 0;
+
         switcher.val(user.id);
 
+        authRoot.addClass("disable");
+
         //get albums
-        const promiseAlbums = $.getJSON(`${root}albums`);
+        const promiseAlbums = $.getJSON(`${root}albums?userId=${user.id}`);
+        let promisePhotos;
+
         promiseAlbums.done((data: album[]) => {
             albums = data;
-            albumsContainer.empty();
             //also get all the photos, this could be done in parallel to improve performance 
             //but shouldnt be done at 2am because bad things could happen
             // having promises.all would be sweet but es3 is shit
-            $.getJSON(`${root}photos`).done((photoData: photo[]) => {
+            promisePhotos = $.getJSON(`${root}photos?userId=${user.id}`)
+            promisePhotos.done((photoData: photo[]) => {
                 photos = photoData;
-
-                //for each album generate dom
-                albums.forEach(album => {
-                    const albumEl = albumContainer.clone();
-                    const albumPhotos = photos.filter(x => x.albumId === album.id);
-
-                    albumEl.append(albumTitle.clone().text(album.title));
-
-                    //for each photo belonging to this album generate photo dom
-                    albumPhotos.forEach((albumPhoto: photo) => {
-                        const photoElement = photoEl.clone();
-                        photoElement.append(photoImage.clone().attr("src", albumPhoto.thumbnailUrl).attr("title", albumPhoto.title));
-                        albumEl.append(photoElement);
-                    });
-
-                    //in the end append all
-                    albumsContainer.append(albumEl);
-                });
+                albumsContainer.empty();
+                renderAlbums();
             });
         });
 
         //posts
-        const promisePosts = $.getJSON(`${root}posts`);
+        const promisePosts = $.getJSON(`${root}posts?userId=${user.id}`);
         promisePosts.done((data: post[]) => {
             posts = data;
-            postsEl.empty();
-            posts.forEach(post => {
-                const postEl = postContainer.clone();
-                postEl.append(postTitle.clone().text(post.title));
-                postEl.append(postBody.clone().text(post.body));
-                postEl.append(postCommentsButton.clone().click((e) => {
-                    ((id) => openComments(id))(post.id);
-                }));
-                postsEl.append(postEl);
-            });
+            renderPosts();
         });
+        $.when(promisePosts, promiseAlbums, promisePosts).done(() => authRoot.removeClass("disable"));
     }
 };
 
+const renderAlbums = () => {
+    //let's not worry about top/skip being over the albums' length
+    //for each album generate dom
+    albums.slice(albumSkip, albumSkip + albumTops).forEach(album => {
+        const albumEl = albumContainer.clone();
+        albumEl.append(albumTitle.clone().text(album.title));
+
+        const photoCont = photoContainer.clone();
+        albumEl.append(photoCont);
+
+        //render photos
+        renderPhotos(photoCont, album.id);
+
+        //attach scoped click handler 
+        albumEl.append(morePhotoButton.clone().click((e) => ((el: JQuery, id: number) => {
+            photoSkip += photoTops;
+            renderPhotos(el, id);
+        })(photoCont, album.id)));
+
+        //in the end append all
+        albumsContainer.append(albumEl);
+    });
+};
+
+const renderPhotos = (photoContainer: JQuery, albumId: number) => {
+    const albumPhotos = photos.filter(x => x.albumId === albumId);
+
+    // let's not worry about tops/skips being higher than album's length
+    //for each photo belonging to this album generate photo dom
+    albumPhotos.slice(photoSkip, photoSkip + photoTops).forEach((albumPhoto: photo) => {
+        const photoElement = photoEl.clone();
+        photoElement.append(photoImage.clone().attr("src", albumPhoto.thumbnailUrl).attr("title", albumPhoto.title));
+        photoContainer.append(photoElement);
+    });
+
+};
+
+const renderPosts = () => {
+    postsEl.empty();
+    posts.forEach(post => {
+        const postEl = postContainer.clone();
+        postEl.append(postTitle.clone().text(post.title));
+        postEl.append(postBody.clone().text(post.body));
+        postEl.append(postCommentsButton.clone().click((e) => ((id) => openComments(id))(post.id)));
+        postsEl.append(postEl);
+    });
+}
+
 const openComments = (postId: number) => {
-
-
+    console.log(postId);
 };
 
 $(document).ready(() => requestUsers().done(() => setup()));
