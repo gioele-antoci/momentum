@@ -1,5 +1,5 @@
 if (!Array.prototype.filter) {
-  Array.prototype.filter = function(fun/*, thisArg*/) {
+  Array.prototype.filter = function (fun/*, thisArg*/) {
     'use strict';
 
     if (this === void 0 || this === null) {
@@ -37,7 +37,7 @@ if (!Array.prototype.filter) {
 // Reference: http://es5.github.io/#x15.4.4.18
 if (!Array.prototype.forEach) {
 
-  Array.prototype.forEach = function(callback/*, thisArg*/) {
+  Array.prototype.forEach = function (callback/*, thisArg*/) {
 
     var T, k;
 
@@ -94,5 +94,15 @@ if (!Array.prototype.forEach) {
       k++;
     }
     // 8. return undefined
+  };
+}
+
+if (!('localStorage' in window)) {
+  window.localStorage = {
+    _data: {},
+    setItem: function (id, val) { return this._data[id] = String(val); },
+    getItem: function (id) { return this._data.hasOwnProperty(id) ? this._data[id] : undefined; },
+    removeItem: function (id) { return delete this._data[id]; },
+    clear: function () { return this._data = {}; }
   };
 }

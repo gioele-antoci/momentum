@@ -3,8 +3,8 @@ var root = `http://jsonplaceholder.typicode.com/`;
 type album = { userId: number; id: number; title: string };
 type photo = { albumId: number; id: number; title: string; url: string; thumbnailUrl: string };
 type post = { userId: number; id: number; title: string; body: string };
-type comment = { postId: number; id: number; name: string; email: string; body: string; };
-type user = { id: number; name: string; username: string };
+type comment = { postId: number; id?: number; name: string; email: string; body: string; };
+type user = { id: number; name: string; username: string; email: string };
 
 let users: user[] = [];
 let posts: post[] = [];
@@ -47,6 +47,8 @@ const setup = () => {
     const form = $(".login-form");
     const input = $(".login-input");
 
+    dialog.setupDialog();
+
     form.on("submit", e => {
         e.preventDefault();
         login(input.val());
@@ -79,7 +81,95 @@ const setup = () => {
         albumSkip += albumTops;
         renderAlbums();
     });
+
+    const localUser = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"));
+    if (localUser) {
+        login(localUser.username);
+    }
 };
+
+class dialog {
+    static dialogEl: JQuery;
+    static textarea: JQuery;
+    static postButton: JQuery;
+    static commentContainer: JQuery;
+    static closeDialogButton: JQuery;
+    static commentBody: JQuery;
+    static commentAuthor: JQuery;
+    static commentEl: JQuery;
+
+    private static postId: number;
+
+    static setupDialog = () => {
+        dialog.dialogEl = $(".dialog");
+        dialog.textarea = $(".comment-textarea");
+        dialog.postButton = $(".post-comment");
+        dialog.commentContainer = $(".comment-container");
+        dialog.closeDialogButton = $(".close-dialog");
+
+        dialog.commentBody = $(".comment-body").detach();
+        dialog.commentAuthor = $(".comment-author").detach();
+        dialog.commentEl = $(".comment").detach();
+
+        dialog.postButton.click(e => {
+            const comm: comment = {
+                postId: dialog.postId,
+                body: dialog.textarea.val(),
+                email: authUser.email,
+                name: "This is a comment name"
+            };
+
+            $.ajax({
+                url: `${root}posts`,
+                method: "POST",
+                data: JSON.stringify(comm)
+            });
+            dialog._renderComment(comm);
+            dialog.textarea.val("");
+            dialog.textarea.focusin().select();
+        });
+
+        dialog.dialogEl.click(e => {
+            if ($(e.target).parents(`.${dialog.dialogEl.attr("class")}`).length === 0 || $(e.target).is(dialog.closeDialogButton)) {
+                dialog.closeDialog();
+            }
+        });
+    };
+
+    static openDialog = () => {
+        dialog.dialogEl.removeClass("hidden");
+        dialog.textarea.focusin().select();
+    };
+
+    static closeDialog = () => {
+        dialog.dialogEl.addClass("hidden");
+    };
+
+    static renderComments = (postId: number) => {
+        //comments
+        authRoot.addClass("disable");
+        const promiseComments = $.getJSON(`${root}comments?postId=${postId}`);
+        promiseComments.done((data: comment[]) => {
+            comments = data;
+            dialog._renderComments(postId);
+            authRoot.removeClass("disable");
+        });
+    };
+
+    private static _renderComments = (postId: number) => {
+        dialog.postId = postId;
+
+        dialog.commentContainer.empty();
+        comments.forEach(x => dialog._renderComment(x));
+    };
+
+    private static _renderComment = (comment: comment) => {
+        const commentEl = dialog.commentEl.clone();
+        commentEl.append(dialog.commentAuthor.clone().text(comment.email));
+        commentEl.append(dialog.commentBody.clone().text(comment.body));
+        dialog.commentContainer.append(commentEl);
+    };
+}
 
 const requestUsers = () => {
     const promise = $.getJSON(`${root}users`);
@@ -90,10 +180,11 @@ const requestUsers = () => {
     return promise;
 };
 
-const login = (text) => {
-    if (text) {
-        const user = users.filter(x => x.username === text)[0];
+const login = (username: string) => {
+    if (username) {
+        const user = users.filter(x => x.username === username)[0];
         if (user) {
+            localStorage.setItem("user", JSON.stringify(user));
             anonRoot.addClass("hidden");
             authRoot.removeClass("hidden");
 
@@ -136,6 +227,7 @@ const changeUser = (user: user) => {
             posts = data;
             renderPosts();
         });
+
         $.when(promisePosts, promiseAlbums, promisePosts).done(() => authRoot.removeClass("disable"));
     }
 };
@@ -189,7 +281,8 @@ const renderPosts = () => {
 }
 
 const openComments = (postId: number) => {
-    console.log(postId);
+    dialog.renderComments(postId);
+    dialog.openDialog();
 };
 
 $(document).ready(() => requestUsers().done(() => setup()));

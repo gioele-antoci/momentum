@@ -31,6 +31,7 @@ var setup = function () {
     authRoot = $(".auth-root");
     var form = $(".login-form");
     var input = $(".login-input");
+    dialog.setupDialog();
     form.on("submit", function (e) {
         e.preventDefault();
         login(input.val());
@@ -58,6 +59,74 @@ var setup = function () {
         albumSkip += albumTops;
         renderAlbums();
     });
+    var localUser = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"));
+    if (localUser) {
+        login(localUser.username);
+    }
+};
+var dialog = (function () {
+    function dialog() {
+    }
+    return dialog;
+}());
+dialog.setupDialog = function () {
+    dialog.dialogEl = $(".dialog");
+    dialog.textarea = $(".comment-textarea");
+    dialog.postButton = $(".post-comment");
+    dialog.commentContainer = $(".comment-container");
+    dialog.closeDialogButton = $(".close-dialog");
+    dialog.commentBody = $(".comment-body").detach();
+    dialog.commentAuthor = $(".comment-author").detach();
+    dialog.commentEl = $(".comment").detach();
+    dialog.postButton.click(function (e) {
+        var comm = {
+            postId: dialog.postId,
+            body: dialog.textarea.val(),
+            email: authUser.email,
+            name: "This is a comment name"
+        };
+        $.ajax({
+            url: root + "posts",
+            method: "POST",
+            data: JSON.stringify(comm)
+        });
+        dialog._renderComment(comm);
+        dialog.textarea.val("");
+        dialog.textarea.focusin().select();
+    });
+    dialog.dialogEl.click(function (e) {
+        if ($(e.target).parents("." + dialog.dialogEl.attr("class")).length === 0 || $(e.target).is(dialog.closeDialogButton)) {
+            dialog.closeDialog();
+        }
+    });
+};
+dialog.openDialog = function () {
+    dialog.dialogEl.removeClass("hidden");
+    dialog.textarea.focusin().select();
+};
+dialog.closeDialog = function () {
+    dialog.dialogEl.addClass("hidden");
+};
+dialog.renderComments = function (postId) {
+    //comments
+    authRoot.addClass("disable");
+    var promiseComments = $.getJSON(root + "comments?postId=" + postId);
+    promiseComments.done(function (data) {
+        comments = data;
+        dialog._renderComments(postId);
+        authRoot.removeClass("disable");
+    });
+};
+dialog._renderComments = function (postId) {
+    dialog.postId = postId;
+    dialog.commentContainer.empty();
+    comments.forEach(function (x) { return dialog._renderComment(x); });
+};
+dialog._renderComment = function (comment) {
+    var commentEl = dialog.commentEl.clone();
+    commentEl.append(dialog.commentAuthor.clone().text(comment.email));
+    commentEl.append(dialog.commentBody.clone().text(comment.body));
+    dialog.commentContainer.append(commentEl);
 };
 var requestUsers = function () {
     var promise = $.getJSON(root + "users");
@@ -66,10 +135,11 @@ var requestUsers = function () {
     });
     return promise;
 };
-var login = function (text) {
-    if (text) {
-        var user = users.filter(function (x) { return x.username === text; })[0];
+var login = function (username) {
+    if (username) {
+        var user = users.filter(function (x) { return x.username === username; })[0];
         if (user) {
+            localStorage.setItem("user", JSON.stringify(user));
             anonRoot.addClass("hidden");
             authRoot.removeClass("hidden");
             authUser = user;
@@ -148,7 +218,8 @@ var renderPosts = function () {
     });
 };
 var openComments = function (postId) {
-    console.log(postId);
+    dialog.renderComments(postId);
+    dialog.openDialog();
 };
 $(document).ready(function () { return requestUsers().done(function () { return setup(); }); });
 //# sourceMappingURL=momentum.js.map 

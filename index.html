@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>momentum</title>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="dist/app.css">
+    <link rel="stylesheet" href="dist/css/normalize.css">
+    <link rel="stylesheet" href="dist/css/app.css">
 
     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-shim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-sham.min.js"></script>
@@ -22,8 +23,8 @@
 
 <body>
     <div class="root">
+        <div class="logo">momentum</div>
         <div class="anon-root">
-            <div class="logo">momentum</div>
             <form class="login-form">
                 <input type="text" class="login-input" placeholder="Enter your username" />
                 <button type="submit">Login</button>
@@ -31,8 +32,12 @@
         </div>
 
         <div class="auth-root hidden">
-            <select class="user-switcher"></select>
+            <div class="users">
+                <div class="label">Users</div>
+                <select class="user-switcher"></select>
+            </div>
 
+            <div class="label">Posts</div>
             <div class="posts">
                 <div class="post-container">
                     <div class="post-title"></div>
@@ -40,6 +45,7 @@
                     <button class="post-comments-button">See comments</button>
                 </div>
             </div>
+            <div class="label">Albums</div>
             <div class="albums-container">
                 <div class="album-container">
                     <div class="album-title"></div>
@@ -48,12 +54,28 @@
                             <img class="photo-image">
                         </div>
                     </div>
-                    <button class="more-photos">More</button>
+                    <button class="more-photos">More photos</button>
                 </div>
             </div>
-            <button class="more-albums">More</button>
+            <button class="more-albums">More albums</button>
+            <div class="dialog hidden">
+                <div class="inner-dialog">
+                    <div class="label">Comments</div>
+                    <textarea class="comment-textarea"></textarea>
+                    <button class="post-comment">Post</button>
+
+                    <div class="comment-container">
+                        <div class="comment">
+                            <div class="comment-author"></div>
+                            <div class="comment-body"></div>
+                        </div>
+                    </div>
+                    <button class="close-dialog">Close</button>
+                </div>
+            </div>
         </div>
     </div>
+
 </body>
 
 </html>
