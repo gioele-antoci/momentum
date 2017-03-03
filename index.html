@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>momentum</title>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="dist/app.css">
+
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-shim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-sham.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.34.2/es6-shim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.34.2/es6-sham.min.js"></script>
+    <script src="https://wzrd.in/standalone/es7-shim@latest"></script>-->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.3/jquery.xdomainrequest.min.js"></script>
+    <script src="dist/polyfill.js"></script>
+    <script src="dist/momentum.js"></script>
+</head>
+
+<body>
+    <div class="root">
+        <div class="anon-root">
+            <div class="logo">momentum</div>
+            <form class="login-form">
+                <input type="text" class="login-input" placeholder="Enter your username" />
+                <button type="submit">Login</button>
+            </form>
+        </div>
+
+        <div class="auth-root hidden">
+            <select class="user-switcher"></select>
+
+            <div class="posts">
+                <div class="post-container">
+                    <div class="post-title"></div>
+                    <div class="post-body"></div>
+                    <button class="post-comments-button">See comments</button>
+                </div>
+            </div>
+            <div class="albums-container">
+                <div class="album-container">
+                    <div class="album-title"></div>
+                    <div class="photo">
+                        <img class="photo-image">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

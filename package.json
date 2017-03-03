@@ -1,0 +1,14 @@
+{
+  "name": "momentum",
+  "version": "0.1.0",
+  "private": true,
+  "devDependencies": {
+    "local-web-server": "^1.2.6",
+    "typescript": "^2.2.1",
+    "@types/jquery": "^2.0.40"
+  },
+  "dependencies": {},
+  "scripts": {
+    "start": "ws"
+  }
+}

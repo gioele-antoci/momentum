@@ -1,0 +1,8 @@
+.hidden {
+    display: none;
+}
+
+html, body, .anon-root, .auth-root {
+    width: 100%;
+    height: 100%;
+}
