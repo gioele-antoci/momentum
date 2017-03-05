@@ -6,7 +6,6 @@ export default class dialog {
     static textarea: JQuery;
     static postButton: JQuery;
     static commentContainer: JQuery;
-    static closeDialogButton: JQuery;
     static commentBody: JQuery;
     static commentAuthor: JQuery;
     static commentEl: JQuery;
@@ -22,7 +21,6 @@ export default class dialog {
         dialog.textarea = $(".comment-textarea");
         dialog.postButton = $(".post-comment");
         dialog.commentContainer = $(".comment-container");
-        dialog.closeDialogButton = $(".close-dialog");
 
         dialog.commentBody = $(".comment-body").detach();
         dialog.commentAuthor = $(".comment-author").detach();
@@ -45,23 +43,15 @@ export default class dialog {
             dialog.textarea.val("");
             dialog.textarea.focusin().select();
         });
-
-        dialog.dialogEl.click(e => {
-            if ($(e.target).parents(`.${dialog.dialogEl.attr("class")}`).length === 0 || $(e.target).is(dialog.closeDialogButton)) {
-                dialog.closeDialog();
-            }
-        });
     };
 
     static openDialog = () => {
-        dialog.manager.pageRoot.addClass("dialog-open");
-        dialog.dialogEl.removeClass("hidden");
+        dialog.dialogEl.modal("show");
         dialog.textarea.focusin().select();
     };
 
     static closeDialog = () => {
-        dialog.dialogEl.addClass("hidden");
-        dialog.manager.pageRoot.removeClass("dialog-open");
+        dialog.dialogEl.modal("hide");
     };
 
     static renderComments = (postId: number) => {

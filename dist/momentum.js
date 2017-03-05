@@ -5,6 +5,12 @@ define("interfaces", ["require", "exports"], function (require, exports) {
     ;
     ;
     ;
+    var view;
+    (function (view) {
+        view[view["users"] = 0] = "users";
+        view[view["posts"] = 1] = "posts";
+        view[view["albums"] = 2] = "albums";
+    })(view = exports.view || (exports.view = {}));
 });
 define("dialog", ["require", "exports"], function (require, exports) {
     "use strict";
@@ -20,7 +26,6 @@ define("dialog", ["require", "exports"], function (require, exports) {
         dialog.textarea = $(".comment-textarea");
         dialog.postButton = $(".post-comment");
         dialog.commentContainer = $(".comment-container");
-        dialog.closeDialogButton = $(".close-dialog");
         dialog.commentBody = $(".comment-body").detach();
         dialog.commentAuthor = $(".comment-author").detach();
         dialog.commentEl = $(".comment").detach();
@@ -40,20 +45,13 @@ define("dialog", ["require", "exports"], function (require, exports) {
             dialog.textarea.val("");
             dialog.textarea.focusin().select();
         });
-        dialog.dialogEl.click(function (e) {
-            if ($(e.target).parents("." + dialog.dialogEl.attr("class")).length === 0 || $(e.target).is(dialog.closeDialogButton)) {
-                dialog.closeDialog();
-            }
-        });
     };
     dialog.openDialog = function () {
-        dialog.manager.pageRoot.addClass("dialog-open");
-        dialog.dialogEl.removeClass("hidden");
+        dialog.dialogEl.modal("show");
         dialog.textarea.focusin().select();
     };
     dialog.closeDialog = function () {
-        dialog.dialogEl.addClass("hidden");
-        dialog.manager.pageRoot.removeClass("dialog-open");
+        dialog.dialogEl.modal("hide");
     };
     dialog.renderComments = function (postId) {
         //comments
@@ -81,7 +79,6 @@ define("dialog", ["require", "exports"], function (require, exports) {
 });
 define("renderer", ["require", "exports", "dialog"], function (require, exports, dialog_1) {
     "use strict";
-    var switcher;
     var postsEl;
     var albumsContainer;
     var moreAlbumsButton;
@@ -95,31 +92,11 @@ define("renderer", ["require", "exports", "dialog"], function (require, exports,
     var photoImage;
     var morePhotoButton;
     var photoContainer;
-    var albumTops = 3;
-    var albumSkip = 0;
-    var photoTops = 5;
     var renderer = (function () {
         function renderer() {
         }
         renderer.setup = function (manager) {
             renderer.manager = manager;
-            var form = $(".login-form");
-            var input = $(".login-input");
-            var logoutButton = $(".logout");
-            logoutButton.click(function (e) {
-                localStorage.removeItem("user");
-                renderer.logout();
-            });
-            form.on("submit", function (e) {
-                e.preventDefault();
-                renderer.login(input.val());
-            });
-            switcher = $(".user-switcher");
-            manager.users.forEach(function (user) { return switcher.append($("<option></option>").attr("value", user.id).text(user.name)); });
-            switcher.on("change", function (e) {
-                var id = e.target.value;
-                renderer.changeUser(manager.users.filter(function (x) { return x.id === parseInt(id); })[0]);
-            });
             postsEl = $(".posts");
             albumsContainer = $(".albums-container");
             //the following order matters, from deepest to least deep in dom tree
@@ -134,55 +111,20 @@ define("renderer", ["require", "exports", "dialog"], function (require, exports,
             albumTitle = $(".album-title").detach();
             albumContainer = $(".album-container").detach();
             moreAlbumsButton = $(".more-albums").click(function (e) {
-                albumSkip += albumTops;
+                renderer.manager.albumSkip += renderer.manager.albumTops;
                 renderer.renderAlbums();
             });
-            var localUser = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"));
-            if (localUser) {
-                renderer.login(localUser.username);
+        };
+        ;
+        renderer.renderAlbums = function (clean) {
+            if (clean === void 0) { clean = false; }
+            if (clean) {
+                albumsContainer.empty();
             }
-        };
-        ;
-        renderer.logout = function () {
-            renderer.manager.anonRoot.removeClass("hidden");
-            renderer.manager.authRoot.addClass("hidden");
-        };
-        ;
-        renderer.changeUser = function (user) {
-            if (user) {
-                //reset
-                albumSkip = 0;
-                switcher.val(user.id);
-                renderer.manager.pageRoot.addClass("disable");
-                //get albums
-                var promiseAlbums = $.getJSON(renderer.manager.root + "albums?userId=" + user.id);
-                var promisePhotos_1;
-                promiseAlbums.done(function (data) {
-                    renderer.manager.albums = data;
-                    //also get all the photos, this could be done in parallel to improve performance 
-                    //but shouldnt be done at 2am because bad things could happen
-                    // having promises.all would be sweet but es3 is shit
-                    promisePhotos_1 = $.getJSON(renderer.manager.root + "photos?userId=" + user.id);
-                    promisePhotos_1.done(function (photoData) {
-                        renderer.manager.photos = photoData;
-                        albumsContainer.empty();
-                        renderer.renderAlbums();
-                    });
-                });
-                //posts
-                var promisePosts = $.getJSON(renderer.manager.root + "posts?userId=" + user.id);
-                promisePosts.done(function (data) {
-                    renderer.manager.posts = data;
-                    renderer.renderPosts();
-                });
-                $.when(promisePosts, promiseAlbums, promisePosts).done(function () { return renderer.manager.pageRoot.removeClass("disable"); });
-            }
-        };
-        ;
-        renderer.renderAlbums = function () {
             //let's not worry about top/skip being over the albums' length
             //for each album generate dom
-            renderer.manager.albums.slice(albumSkip, albumSkip + albumTops).forEach(function (album) {
+            renderer.manager.albums.slice(renderer.manager.albumSkip, renderer.manager.albumSkip + renderer.manager.albumTops)
+                .forEach(function (album) {
                 var albumEl = albumContainer.clone();
                 albumEl.append(albumTitle.clone().text(album.title));
                 var photoCont = photoContainer.clone();
@@ -203,7 +145,8 @@ define("renderer", ["require", "exports", "dialog"], function (require, exports,
             var photoSkip = photoContainer.children().length;
             // let's not worry about tops/skips being higher than album's length
             //for each photo belonging to this album generate photo dom
-            albumPhotos.slice(photoSkip, photoSkip + photoTops).forEach(function (albumPhoto) {
+            albumPhotos.slice(photoSkip, photoSkip + renderer.manager.photoTops)
+                .forEach(function (albumPhoto) {
                 var photoElement = photoEl.clone();
                 photoElement.append(photoImage.clone().attr("src", albumPhoto.thumbnailUrl).attr("title", albumPhoto.title));
                 photoContainer.append(photoElement);
@@ -227,48 +170,171 @@ define("renderer", ["require", "exports", "dialog"], function (require, exports,
         ;
         return renderer;
     }());
-    renderer.login = function (username) {
-        if (username) {
-            var user = renderer.manager.users.filter(function (x) { return x.username === username; })[0];
-            if (user) {
-                localStorage.setItem("user", JSON.stringify(user));
-                renderer.manager.anonRoot.addClass("hidden");
-                renderer.manager.authRoot.removeClass("hidden");
-                renderer.manager.authUser = user;
-                renderer.changeUser(user);
-            }
-        }
-    };
     exports.renderer = renderer;
 });
 //# sourceMappingURL=momentum.js.map 
-define("appManager", ["require", "exports", "renderer", "dialog"], function (require, exports, renderer_1, dialog_2) {
+define("pageSwitcher", ["require", "exports", "interfaces"], function (require, exports, interfaces_1) {
+    "use strict";
+    var pageSwitcher = (function () {
+        function pageSwitcher() {
+        }
+        pageSwitcher.setup = function (manager) {
+            var _this = this;
+            pageSwitcher.manager = manager;
+            pageSwitcher.pageHeader = $(".page-header");
+            pageSwitcher.navUsers = $(".nav-users").click(function (e) { return _this.changeView(interfaces_1.view.users); });
+            pageSwitcher.navPosts = $(".nav-posts").click(function (e) { return _this.changeView(interfaces_1.view.posts); });
+            pageSwitcher.navAlbums = $(".nav-albums").click(function (e) { return _this.changeView(interfaces_1.view.albums); });
+            pageSwitcher.usersView = $(".users-view");
+            pageSwitcher.postsView = $(".posts-view");
+            pageSwitcher.albumsView = $(".albums-view");
+            this.changeView(interfaces_1.view.posts);
+        };
+        pageSwitcher.changeView = function (viewToActivate) {
+            if (typeof this.activeView !== "undefined") {
+                this.activeViewEl.addClass("hidden");
+                switch (this.activeView) {
+                    case interfaces_1.view.users:
+                        this.navUsers.removeClass("active");
+                        break;
+                    case interfaces_1.view.posts:
+                        this.navPosts.removeClass("active");
+                        break;
+                    case interfaces_1.view.albums:
+                        this.navAlbums.removeClass("active");
+                        break;
+                }
+            }
+            this.activeView = viewToActivate;
+            switch (this.activeView) {
+                case interfaces_1.view.users:
+                    this.activeViewEl = this.usersView.removeClass("hidden");
+                    this.pageHeader.text("Users");
+                    this.navUsers.addClass("active");
+                    break;
+                case interfaces_1.view.posts:
+                    this.activeViewEl = this.postsView.removeClass("hidden");
+                    this.pageHeader.text("Posts");
+                    this.navPosts.addClass("active");
+                    break;
+                case interfaces_1.view.albums:
+                    this.activeViewEl = this.albumsView.removeClass("hidden");
+                    this.pageHeader.text("Albums");
+                    this.navAlbums.addClass("active");
+                    break;
+            }
+        };
+        return pageSwitcher;
+    }());
+    exports.__esModule = true;
+    exports["default"] = pageSwitcher;
+});
+define("appManager", ["require", "exports", "renderer", "dialog", "pageSwitcher"], function (require, exports, renderer_1, dialog_2, pageSwitcher_1) {
     "use strict";
     var appManager = (function () {
         function appManager() {
             var _this = this;
-            this.root = "http://jsonplaceholder.typicode.com/";
+            this.root = document.location.protocol + "//jsonplaceholder.typicode.com/";
             this.users = [];
             this.posts = [];
             this.albums = [];
             this.photos = [];
+            this.albumTops = 3;
+            this.albumSkip = 0;
+            this.photoTops = 5;
             $(document).ready(function () {
-                _this.pageRoot = $(".root");
-                _this.anonRoot = $(".anon-root");
-                _this.authRoot = $(".auth-root");
+                _this.setup();
                 dialog_2["default"].setup(_this);
-                _this.requestUsers().done(function () { return renderer_1.renderer.setup(_this); });
+                pageSwitcher_1["default"].setup(_this);
+                _this.requestUsers().done(function () {
+                    renderer_1.renderer.setup(_this);
+                    _this.autologin();
+                });
             });
         }
+        appManager.prototype.setup = function () {
+            var _this = this;
+            this.pageRoot = $(".root");
+            this.anonRoot = $(".anon-root");
+            this.authRoot = $(".auth-root");
+            this.form = $(".login-form");
+            this.input = $(".login-input");
+            this.logoutButton = $(".logout");
+            this.logoutButton.click(function (e) {
+                _this.logout();
+            });
+            this.form.on("submit", function (e) {
+                e.preventDefault();
+                _this.login(_this.input.val());
+            });
+            this.switcher = $(".user-switcher");
+            this.switcher.on("change", function (e) {
+                var id = e.target.value;
+                _this.changeUser(_this.users.filter(function (x) { return x.id === parseInt(id); })[0]);
+            });
+        };
         appManager.prototype.requestUsers = function () {
             var _this = this;
             var promise = $.getJSON(this.root + "users");
             promise.done(function (data) {
                 _this.users = data;
+                _this.users.forEach(function (user) { return _this.switcher.append($("<option></option>").attr("value", user.id).text(user.name)); });
             });
             return promise;
         };
-        ;
+        appManager.prototype.autologin = function () {
+            var localUser = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"));
+            if (localUser) {
+                this.login(localUser.username);
+            }
+        };
+        appManager.prototype.login = function (username) {
+            if (username) {
+                var user = this.users.filter(function (x) { return x.username === username; })[0];
+                if (user) {
+                    localStorage.setItem("user", JSON.stringify(user));
+                    this.anonRoot.addClass("hidden");
+                    this.authRoot.removeClass("hidden");
+                    this.authUser = user;
+                    this.changeUser(user);
+                }
+            }
+        };
+        appManager.prototype.logout = function () {
+            localStorage.removeItem("user");
+            this.anonRoot.removeClass("hidden");
+            this.authRoot.addClass("hidden");
+        };
+        appManager.prototype.changeUser = function (user) {
+            var _this = this;
+            if (user) {
+                //reset
+                this.albumSkip = 0;
+                this.switcher.val(user.id);
+                this.pageRoot.addClass("disable");
+                //get albums
+                var promiseAlbums = $.getJSON(this.root + "albums?userId=" + user.id);
+                var promisePhotos_1;
+                promiseAlbums.done(function (data) {
+                    _this.albums = data;
+                    //also get all the photos, this could be done in parallel to improve performance 
+                    //but shouldnt be done at 2am because bad things could happen
+                    // having promises.all would be sweet but es3 is shit
+                    promisePhotos_1 = $.getJSON(_this.root + "photos?userId=" + user.id);
+                    promisePhotos_1.done(function (photoData) {
+                        _this.photos = photoData;
+                        renderer_1.renderer.renderAlbums(true);
+                    });
+                });
+                //posts
+                var promisePosts = $.getJSON(this.root + "posts?userId=" + user.id);
+                promisePosts.done(function (data) {
+                    _this.posts = data;
+                    renderer_1.renderer.renderPosts();
+                });
+                $.when(promisePosts, promiseAlbums, promisePosts).done(function () { return _this.pageRoot.removeClass("disable"); });
+            }
+        };
         return appManager;
     }());
     exports.appManager = appManager;

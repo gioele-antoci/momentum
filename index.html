@@ -7,22 +7,29 @@
     <title>momentum</title>
     <link rel="stylesheet" href="dist/css/normalize.css">
     <link rel="stylesheet" href="dist/css/app.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="dist/css/dashboard.css">
 
+    <!--[if IE]>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-shim.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-sham.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.34.2/es6-shim.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.34.2/es6-sham.js"></script>
     <script src="https://wzrd.in/standalone/es7-shim@latest"></script>
+    <script src="//oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+    <script src="//oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+    <script src="dist/polyfill.js"></script>
+<![endif]-->
+
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.3/jquery.xdomainrequest.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.4.3/velocity.min.js"></script>
     <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>-->
 
     <script src="scripts/require.js"></script>
-    <script src="dist/polyfill.js"></script>
     <script src="dist/momentum.js"></script>
     <script src="dist/bootstrapper.js"></script>
 
@@ -30,62 +37,104 @@
 
 <body>
     <div class="root">
-        <div class="logo">momentum</div>
+        <!--anon view-->
         <div class="anon-root">
             <div class="anon-root-internal">
                 <form class="login-form">
                     <input type="text" class="login-input" placeholder="Enter your username" value="Bret" />
-                    <button class="btn" type="submit">Login</button>
+                    <button class="button raised" type="submit">Login</button>
                 </form>
             </div>
         </div>
-
+        <!--END anon view-->
+        <!--auth view-->
         <div class="auth-root hidden">
-            <div class="users">
-                <div class="label">Users</div>
-                <select class="user-switcher"></select>
-                <button class="logout btn" type="submit">Logout</button>
-            </div>
-
-            <div class="label">Posts</div>
-            <div class="posts">
-                <div class="post-container">
-                    <div class="post-title"></div>
-                    <div class="post-body"></div>
-                    <button class="post-comments-button btn">See comments</button>
+            <nav class="navbar navbar-inverse navbar-fixed-top">
+                <div class="container-fluid">
+                    <div class="navbar-header">
+                        <button type="button button raised" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false"
+                            aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+                        <a class="navbar-brand">momentum2</a>
+                    </div>
+                    <div id="navbar" class="navbar-collapse collapse">
+                        <ul class="nav navbar-nav navbar-right">
+                            <li class="nav-users"><a href="#">Users</a></li>
+                            <li class="nav-posts"><a href="#">Posts</a></li>
+                            <li class="nav-albums"><a href="#">Albums</a></li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
-            <div class="label">Albums</div>
-            <div class="albums-container">
-                <div class="album-container">
-                    <div class="album-title"></div>
-                    <div class="photo-container">
-                        <div class="photo">
-                            <img class="photo-image">
+            </nav>
+
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="main">
+                        <h1 class="page-header"></h1>
+
+                        <div class="users-view hidden" data-view="users">
+                            <div class="users">
+                                <select class="user-switcher"></select>
+                                <button class="logout button raised" type="submit">Logout</button>
+                            </div>
+                        </div>
+                        <div class="posts-view hidden" data-view="posts">
+                            <div class="posts">
+                                <div class="post-container card">
+                                    <div class="post-title"></div>
+                                    <div class="post-body"></div>
+                                    <button class="post-comments-button button raised">See comments</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="albums-view hidden" data-view="albums">
+                            <div class="albums-container">
+                                <div class="album-container">
+                                    <div class="album-title"></div>
+                                    <div class="photo-container">
+                                        <div class="photo">
+                                            <img class="photo-image" />
+                                        </div>
+                                    </div>
+                                    <button class="more-photos button raised">More photos</button>
+                                </div>
+                            </div>
+                            <button class="more-albums button raised">More albums</button>
                         </div>
                     </div>
-                    <button class="more-photos btn">More photos</button>
                 </div>
             </div>
-            <button class="more-albums btn">More albums</button>
+            <!--END auth view -->
         </div>
-        <div class="dialog hidden">
-            <div class="inner-dialog">
-                <div class="label">Comments</div>
-                <textarea class="comment-textarea"></textarea>
-                <button class="post-comment btn">Post</button>
+    </div>
+    <!--dialog-->
+    <div class="dialog modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Comments</h4>
+                    <div class="modal-body">
 
-                <div class="comment-container">
-                    <div class="comment">
-                        <div class="comment-author"></div>
-                        <div class="comment-body"></div>
+                        <textarea class="comment-textarea"></textarea>
+                        <button class="post-comment button raised">Post</button>
+
+                        <div class="comment-container">
+                            <div class="comment">
+                                <div class="comment-author"></div>
+                                <div class="comment-body"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <button class="close-dialog btn">x</button>
             </div>
         </div>
     </div>
-
+    <!--END dialog-->
 </body>
 
 </html>
