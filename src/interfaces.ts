@@ -40,13 +40,9 @@ export interface manager {
     anonRoot: JQuery;
     authRoot: JQuery;
     root: string;
-    albumTops: number;
-    albumSkip: number;
-    photoTops: number;
 }
 
 export enum view {
-    users,
     posts,
     albums
 }

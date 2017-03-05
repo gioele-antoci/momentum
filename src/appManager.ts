@@ -19,11 +19,8 @@ export class appManager implements manager {
     form: JQuery;
     input: JQuery;
     logoutButton: JQuery;
-    switcher: JQuery;
-
-    albumTops = 3;
-    albumSkip = 0;
-    photoTops = 5;
+    userSwitcher: JQuery;
+    albumSwitcher: JQuery;
 
     constructor() {
         $(document).ready(() => {
@@ -31,7 +28,8 @@ export class appManager implements manager {
             dialog.setup(this);
             pageSwitcher.setup(this);
             this.requestUsers().done(() => {
-                renderer.setup(this);
+                renderer.setup();
+                renderer.renderUserSwitcher(this.users);
                 this.autologin();
             });
         });
@@ -54,18 +52,33 @@ export class appManager implements manager {
             this.login(this.input.val());
         });
 
-        this.switcher = $(".user-switcher");
-        this.switcher.on("change", e => {
+        this.userSwitcher = $(".user-switcher");
+        this.userSwitcher.on("change", e => {
             const id = (<HTMLOptionElement>e.target).value;
             this.changeUser(this.users.filter(x => x.id === parseInt(id))[0]);
         });
+
+        this.albumSwitcher = $(".album-switcher");
+        this.albumSwitcher.on("change", e => {
+            const id = (<HTMLOptionElement>e.target).value;
+            this.changeAlbum(this.albums.filter(x => x.id === parseInt(id))[0]);
+        });
+
+        const resizeListener = () => {
+            $(window).one("resize", () => {
+                const width = $(window).width();
+                this.pageRoot.toggleClass("small", width < 768);
+                setTimeout(() => resizeListener(), 100); //rebinds itself after 100ms
+            });
+        }
+
+        resizeListener();
     }
 
     private requestUsers(): JQueryXHR {
         const promise = $.getJSON(`${this.root}users`);
         promise.done(data => {
             this.users = data;
-            this.users.forEach(user => this.switcher.append($("<option></option>").attr("value", user.id).text(user.name)));
         });
 
         return promise;
@@ -102,9 +115,7 @@ export class appManager implements manager {
     changeUser(user: user): void {
         if (user) {
             //reset
-            this.albumSkip = 0;
-            this.switcher.val(user.id);
-
+            this.userSwitcher.val(user.id);
             this.pageRoot.addClass("disable");
 
             //get albums
@@ -113,13 +124,15 @@ export class appManager implements manager {
 
             promiseAlbums.done((data: album[]) => {
                 this.albums = data;
+                renderer.renderAlbumSwitcher(this.albums);
+
                 //also get all the photos, this could be done in parallel to improve performance 
                 //but shouldnt be done at 2am because bad things could happen
                 // having promises.all would be sweet but es3 is shit
                 promisePhotos = $.getJSON(`${this.root}photos?userId=${user.id}`)
                 promisePhotos.done((photoData: photo[]) => {
                     this.photos = photoData;
-                    renderer.renderAlbums(true);
+                    renderer.renderAlbum(this.albums[0], this.getPhotosForAlbum(this.albums[0].id));
                 });
             });
 
@@ -127,11 +140,21 @@ export class appManager implements manager {
             const promisePosts = $.getJSON(`${this.root}posts?userId=${user.id}`);
             promisePosts.done((data: post[]) => {
                 this.posts = data;
-                renderer.renderPosts();
+                renderer.renderPosts(this.posts);
             });
 
             $.when(promisePosts, promiseAlbums, promisePosts).done(() => this.pageRoot.removeClass("disable"));
         }
+
+
+    }
+
+    changeAlbum(album: album): void {
+        renderer.renderAlbum(album, this.getPhotosForAlbum(album.id));
+    }
+
+    private getPhotosForAlbum(albumId: number): photo[] {
+        return this.photos.filter(x => x.albumId === albumId);
     }
 
 }

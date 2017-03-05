@@ -46,12 +46,12 @@ export default class dialog {
     };
 
     static openDialog = () => {
-        dialog.dialogEl.modal("show");
+        (<any>dialog.dialogEl).modal("show");
         dialog.textarea.focusin().select();
     };
 
     static closeDialog = () => {
-        dialog.dialogEl.modal("hide");
+        (<any>dialog.dialogEl).modal("hide");
     };
 
     static renderComments = (postId: number) => {

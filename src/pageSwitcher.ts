@@ -5,11 +5,9 @@ export default class pageSwitcher {
     private static manager: manager;
 
     private static pageHeader: JQuery;
-    private static navUsers: JQuery;
     private static navPosts: JQuery;
     private static navAlbums: JQuery;
 
-    private static usersView: JQuery;
     private static postsView: JQuery;
     private static albumsView: JQuery;
 
@@ -19,11 +17,9 @@ export default class pageSwitcher {
     static setup(manager: manager): void {
         pageSwitcher.manager = manager;
         pageSwitcher.pageHeader = $(".page-header");
-        pageSwitcher.navUsers = $(".nav-users").click(e => this.changeView(view.users));
         pageSwitcher.navPosts = $(".nav-posts").click(e => this.changeView(view.posts));
         pageSwitcher.navAlbums = $(".nav-albums").click(e => this.changeView(view.albums));
 
-        pageSwitcher.usersView = $(".users-view");
         pageSwitcher.postsView = $(".posts-view");
         pageSwitcher.albumsView = $(".albums-view");
 
@@ -34,10 +30,7 @@ export default class pageSwitcher {
         if (typeof this.activeView !== "undefined") {
             this.activeViewEl.addClass("hidden");
 
-            switch (this.activeView) {
-                case view.users:
-                    this.navUsers.removeClass("active");
-                    break;
+            switch (this.activeView) {            
                 case view.posts:
                     this.navPosts.removeClass("active");
                     break;
@@ -48,14 +41,7 @@ export default class pageSwitcher {
         }
 
         this.activeView = viewToActivate;
-        switch (this.activeView) {
-            case view.users:
-                this.activeViewEl = this.usersView.removeClass("hidden");
-                this.pageHeader.text("Users");
-                this.navUsers.addClass("active");
-
-                break;
-
+        switch (this.activeView) {           
             case view.posts:
                 this.activeViewEl = this.postsView.removeClass("hidden");
                 this.pageHeader.text("Posts");

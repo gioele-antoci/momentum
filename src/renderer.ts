@@ -1,10 +1,8 @@
-import { album, comment, photo, post, user, manager } from "./interfaces";
+import { album, comment, photo, post, user } from "./interfaces";
 import dialog from "./dialog";
 
 let postsEl: JQuery;
-
 let albumsContainer: JQuery;
-let moreAlbumsButton: JQuery;
 
 let postContainer: JQuery;
 let postTitle: JQuery;
@@ -13,90 +11,87 @@ let postCommentsButton: JQuery;
 
 let albumContainer: JQuery;
 let albumTitle: JQuery;
-let photoEl: JQuery;
-let photoImage: JQuery;
-let morePhotoButton: JQuery;
-let photoContainer: JQuery;
+
+let userSwitcher: JQuery;
+let albumSwitcher: JQuery;
 
 
 export class renderer {
 
-    private static manager: manager;
-
-    static setup(manager: manager): void {
-        renderer.manager = manager;
-
+    static setup(): void {
         postsEl = $(".posts");
         albumsContainer = $(".albums-container");
+        albumSwitcher = $(".album-switcher");
 
         //the following order matters, from deepest to least deep in dom tree
         postTitle = $(".post-title").detach();
         postBody = $(".post-body").detach();
         postCommentsButton = $(".post-comments-button").detach();
         postContainer = $(".post-container").detach();
-
-        photoImage = $(".photo-image").detach();
-        photoEl = $(".photo").detach();
-        morePhotoButton = $(".more-photos").detach();
-        photoContainer = $(".photo-container").detach();
         albumTitle = $(".album-title").detach();
         albumContainer = $(".album-container").detach();
 
-        moreAlbumsButton = $(".more-albums").click(e => {
-            renderer.manager.albumSkip += renderer.manager.albumTops;
-            renderer.renderAlbums();
+        userSwitcher = $(".user-switcher");
+        albumSwitcher = $(".album-switcher");
+    }
+
+    static renderUserSwitcher(users: user[]): void {
+        users.forEach(user => userSwitcher.append($("<option></option>").attr("value", user.id).text(user.name)));
+    }
+
+    static renderAlbumSwitcher(albums: album[]): void {
+        albumSwitcher.empty();
+        albums.forEach(album => albumSwitcher.append($("<option></option>").attr("value", album.id).text(album.title)));
+    }
+
+    static renderAlbum(album: album, albumPhotos: photo[]) {
+
+        //set album title
+        const albumEl = albumContainer.clone();
+        albumEl.append(albumTitle.clone().text(album.title));
+
+        const photoCont = $(".photo-container", albumEl);
+
+        //set unique id for carousel and its controls
+        const id = `album${album.id}`;
+        photoCont.attr("id", id);
+        $(".carousel-control", photoCont).attr("href", `#${id}`);
+
+        //add to dom
+        albumEl.append(photoCont);
+
+        //render photos inside carousel
+        renderer.renderPhotos(albumPhotos, photoCont, album.id);
+
+        //in the end append all
+        albumsContainer.append(albumEl);
+    }
+
+    static renderPhotos(photos: photo[], photoContainer: JQuery, albumId: number) {
+        //get photos for this album only
+        const albumPhotos = photos.filter(x => x.albumId === albumId);
+        const carouselInner = $(".carousel-inner", photoContainer);
+        const photoElTemplate = $(".photo.item", carouselInner).detach();
+
+        albumPhotos.forEach((photo: photo) => {
+            const photoEl = photoElTemplate.clone();
+            //add image
+            const photoImage = $(".photo-image", photoEl);
+            photoImage.attr("src", photo.url).attr("title", photo.title);
+            //add caption
+            const photoCaption = $(".carousel-caption", photoEl);
+            photoCaption.text(photo.title);
+
+            carouselInner.append(photoEl);
         });
 
-    };
+        //mark first image as active
+        $(".item", carouselInner).first().addClass("active");
+    }
 
-    static renderAlbums(clean = false) {
-
-        if (clean) {
-            albumsContainer.empty();
-        }
-
-        //let's not worry about top/skip being over the albums' length
-        //for each album generate dom
-        renderer.manager.albums.slice(renderer.manager.albumSkip, renderer.manager.albumSkip + renderer.manager.albumTops)
-            .forEach(album => {
-                const albumEl = albumContainer.clone();
-                albumEl.append(albumTitle.clone().text(album.title));
-
-                const photoCont = photoContainer.clone();
-                albumEl.append(photoCont);
-
-                //render photos
-                renderer.renderPhotos(photoCont, album.id);
-
-                //attach scoped click handler 
-                albumEl.append(morePhotoButton.clone().click((e) => ((el: JQuery, id: number) => {
-                    renderer.renderPhotos(el, id);
-                })(photoCont, album.id)));
-
-                //in the end append all
-                albumsContainer.append(albumEl);
-            });
-    };
-
-    static renderPhotos(photoContainer: JQuery, albumId: number) {
-        const albumPhotos = renderer.manager.photos.filter(x => x.albumId === albumId);
-
-        const photoSkip = photoContainer.children().length;
-
-        // let's not worry about tops/skips being higher than album's length
-        //for each photo belonging to this album generate photo dom
-        albumPhotos.slice(photoSkip, photoSkip + renderer.manager.photoTops)
-            .forEach((albumPhoto: photo) => {
-                const photoElement = photoEl.clone();
-                photoElement.append(photoImage.clone().attr("src", albumPhoto.thumbnailUrl).attr("title", albumPhoto.title));
-                photoContainer.append(photoElement);
-            });
-
-    };
-
-    static renderPosts() {
+    static renderPosts(posts: post[]) {
         postsEl.empty();
-        renderer.manager.posts.forEach(post => {
+        posts.forEach(post => {
             const postEl = postContainer.clone();
             postEl.append(postTitle.clone().text(post.title));
             postEl.append(postBody.clone().text(post.body));
@@ -108,7 +103,7 @@ export class renderer {
     static openComments(postId: number) {
         dialog.renderComments(postId);
         dialog.openDialog();
-    };
+    }
 }
 
 

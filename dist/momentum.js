@@ -7,9 +7,8 @@ define("interfaces", ["require", "exports"], function (require, exports) {
     ;
     var view;
     (function (view) {
-        view[view["users"] = 0] = "users";
-        view[view["posts"] = 1] = "posts";
-        view[view["albums"] = 2] = "albums";
+        view[view["posts"] = 0] = "posts";
+        view[view["albums"] = 1] = "albums";
     })(view = exports.view || (exports.view = {}));
 });
 define("dialog", ["require", "exports"], function (require, exports) {
@@ -81,81 +80,75 @@ define("renderer", ["require", "exports", "dialog"], function (require, exports,
     "use strict";
     var postsEl;
     var albumsContainer;
-    var moreAlbumsButton;
     var postContainer;
     var postTitle;
     var postBody;
     var postCommentsButton;
     var albumContainer;
     var albumTitle;
-    var photoEl;
-    var photoImage;
-    var morePhotoButton;
-    var photoContainer;
+    var userSwitcher;
+    var albumSwitcher;
     var renderer = (function () {
         function renderer() {
         }
-        renderer.setup = function (manager) {
-            renderer.manager = manager;
+        renderer.setup = function () {
             postsEl = $(".posts");
             albumsContainer = $(".albums-container");
+            albumSwitcher = $(".album-switcher");
             //the following order matters, from deepest to least deep in dom tree
             postTitle = $(".post-title").detach();
             postBody = $(".post-body").detach();
             postCommentsButton = $(".post-comments-button").detach();
             postContainer = $(".post-container").detach();
-            photoImage = $(".photo-image").detach();
-            photoEl = $(".photo").detach();
-            morePhotoButton = $(".more-photos").detach();
-            photoContainer = $(".photo-container").detach();
             albumTitle = $(".album-title").detach();
             albumContainer = $(".album-container").detach();
-            moreAlbumsButton = $(".more-albums").click(function (e) {
-                renderer.manager.albumSkip += renderer.manager.albumTops;
-                renderer.renderAlbums();
-            });
+            userSwitcher = $(".user-switcher");
+            albumSwitcher = $(".album-switcher");
         };
-        ;
-        renderer.renderAlbums = function (clean) {
-            if (clean === void 0) { clean = false; }
-            if (clean) {
-                albumsContainer.empty();
-            }
-            //let's not worry about top/skip being over the albums' length
-            //for each album generate dom
-            renderer.manager.albums.slice(renderer.manager.albumSkip, renderer.manager.albumSkip + renderer.manager.albumTops)
-                .forEach(function (album) {
-                var albumEl = albumContainer.clone();
-                albumEl.append(albumTitle.clone().text(album.title));
-                var photoCont = photoContainer.clone();
-                albumEl.append(photoCont);
-                //render photos
-                renderer.renderPhotos(photoCont, album.id);
-                //attach scoped click handler 
-                albumEl.append(morePhotoButton.clone().click(function (e) { return (function (el, id) {
-                    renderer.renderPhotos(el, id);
-                })(photoCont, album.id); }));
-                //in the end append all
-                albumsContainer.append(albumEl);
-            });
+        renderer.renderUserSwitcher = function (users) {
+            users.forEach(function (user) { return userSwitcher.append($("<option></option>").attr("value", user.id).text(user.name)); });
         };
-        ;
-        renderer.renderPhotos = function (photoContainer, albumId) {
-            var albumPhotos = renderer.manager.photos.filter(function (x) { return x.albumId === albumId; });
-            var photoSkip = photoContainer.children().length;
-            // let's not worry about tops/skips being higher than album's length
-            //for each photo belonging to this album generate photo dom
-            albumPhotos.slice(photoSkip, photoSkip + renderer.manager.photoTops)
-                .forEach(function (albumPhoto) {
-                var photoElement = photoEl.clone();
-                photoElement.append(photoImage.clone().attr("src", albumPhoto.thumbnailUrl).attr("title", albumPhoto.title));
-                photoContainer.append(photoElement);
-            });
+        renderer.renderAlbumSwitcher = function (albums) {
+            albumSwitcher.empty();
+            albums.forEach(function (album) { return albumSwitcher.append($("<option></option>").attr("value", album.id).text(album.title)); });
         };
-        ;
-        renderer.renderPosts = function () {
+        renderer.renderAlbum = function (album, albumPhotos) {
+            //set album title
+            var albumEl = albumContainer.clone();
+            albumEl.append(albumTitle.clone().text(album.title));
+            var photoCont = $(".photo-container", albumEl);
+            //set unique id for carousel and its controls
+            var id = "album" + album.id;
+            photoCont.attr("id", id);
+            $(".carousel-control", photoCont).attr("href", "#" + id);
+            //add to dom
+            albumEl.append(photoCont);
+            //render photos inside carousel
+            renderer.renderPhotos(albumPhotos, photoCont, album.id);
+            //in the end append all
+            albumsContainer.append(albumEl);
+        };
+        renderer.renderPhotos = function (photos, photoContainer, albumId) {
+            //get photos for this album only
+            var albumPhotos = photos.filter(function (x) { return x.albumId === albumId; });
+            var carouselInner = $(".carousel-inner", photoContainer);
+            var photoElTemplate = $(".photo.item", carouselInner).detach();
+            albumPhotos.forEach(function (photo) {
+                var photoEl = photoElTemplate.clone();
+                //add image
+                var photoImage = $(".photo-image", photoEl);
+                photoImage.attr("src", photo.url).attr("title", photo.title);
+                //add caption
+                var photoCaption = $(".carousel-caption", photoEl);
+                photoCaption.text(photo.title);
+                carouselInner.append(photoEl);
+            });
+            //mark first image as active
+            $(".item", carouselInner).first().addClass("active");
+        };
+        renderer.renderPosts = function (posts) {
             postsEl.empty();
-            renderer.manager.posts.forEach(function (post) {
+            posts.forEach(function (post) {
                 var postEl = postContainer.clone();
                 postEl.append(postTitle.clone().text(post.title));
                 postEl.append(postBody.clone().text(post.body));
@@ -167,7 +160,6 @@ define("renderer", ["require", "exports", "dialog"], function (require, exports,
             dialog_1["default"].renderComments(postId);
             dialog_1["default"].openDialog();
         };
-        ;
         return renderer;
     }());
     exports.renderer = renderer;
@@ -182,10 +174,8 @@ define("pageSwitcher", ["require", "exports", "interfaces"], function (require, 
             var _this = this;
             pageSwitcher.manager = manager;
             pageSwitcher.pageHeader = $(".page-header");
-            pageSwitcher.navUsers = $(".nav-users").click(function (e) { return _this.changeView(interfaces_1.view.users); });
             pageSwitcher.navPosts = $(".nav-posts").click(function (e) { return _this.changeView(interfaces_1.view.posts); });
             pageSwitcher.navAlbums = $(".nav-albums").click(function (e) { return _this.changeView(interfaces_1.view.albums); });
-            pageSwitcher.usersView = $(".users-view");
             pageSwitcher.postsView = $(".posts-view");
             pageSwitcher.albumsView = $(".albums-view");
             this.changeView(interfaces_1.view.posts);
@@ -194,9 +184,6 @@ define("pageSwitcher", ["require", "exports", "interfaces"], function (require, 
             if (typeof this.activeView !== "undefined") {
                 this.activeViewEl.addClass("hidden");
                 switch (this.activeView) {
-                    case interfaces_1.view.users:
-                        this.navUsers.removeClass("active");
-                        break;
                     case interfaces_1.view.posts:
                         this.navPosts.removeClass("active");
                         break;
@@ -207,11 +194,6 @@ define("pageSwitcher", ["require", "exports", "interfaces"], function (require, 
             }
             this.activeView = viewToActivate;
             switch (this.activeView) {
-                case interfaces_1.view.users:
-                    this.activeViewEl = this.usersView.removeClass("hidden");
-                    this.pageHeader.text("Users");
-                    this.navUsers.addClass("active");
-                    break;
                 case interfaces_1.view.posts:
                     this.activeViewEl = this.postsView.removeClass("hidden");
                     this.pageHeader.text("Posts");
@@ -239,15 +221,13 @@ define("appManager", ["require", "exports", "renderer", "dialog", "pageSwitcher"
             this.posts = [];
             this.albums = [];
             this.photos = [];
-            this.albumTops = 3;
-            this.albumSkip = 0;
-            this.photoTops = 5;
             $(document).ready(function () {
                 _this.setup();
                 dialog_2["default"].setup(_this);
                 pageSwitcher_1["default"].setup(_this);
                 _this.requestUsers().done(function () {
-                    renderer_1.renderer.setup(_this);
+                    renderer_1.renderer.setup();
+                    renderer_1.renderer.renderUserSwitcher(_this.users);
                     _this.autologin();
                 });
             });
@@ -267,18 +247,30 @@ define("appManager", ["require", "exports", "renderer", "dialog", "pageSwitcher"
                 e.preventDefault();
                 _this.login(_this.input.val());
             });
-            this.switcher = $(".user-switcher");
-            this.switcher.on("change", function (e) {
+            this.userSwitcher = $(".user-switcher");
+            this.userSwitcher.on("change", function (e) {
                 var id = e.target.value;
                 _this.changeUser(_this.users.filter(function (x) { return x.id === parseInt(id); })[0]);
             });
+            this.albumSwitcher = $(".album-switcher");
+            this.albumSwitcher.on("change", function (e) {
+                var id = e.target.value;
+                _this.changeAlbum(_this.albums.filter(function (x) { return x.id === parseInt(id); })[0]);
+            });
+            var resizeListener = function () {
+                $(window).one("resize", function () {
+                    var width = $(window).width();
+                    _this.pageRoot.toggleClass("small", width < 768);
+                    setTimeout(function () { return resizeListener(); }, 100); //rebinds itself after 100ms
+                });
+            };
+            resizeListener();
         };
         appManager.prototype.requestUsers = function () {
             var _this = this;
             var promise = $.getJSON(this.root + "users");
             promise.done(function (data) {
                 _this.users = data;
-                _this.users.forEach(function (user) { return _this.switcher.append($("<option></option>").attr("value", user.id).text(user.name)); });
             });
             return promise;
         };
@@ -309,31 +301,37 @@ define("appManager", ["require", "exports", "renderer", "dialog", "pageSwitcher"
             var _this = this;
             if (user) {
                 //reset
-                this.albumSkip = 0;
-                this.switcher.val(user.id);
+                this.userSwitcher.val(user.id);
                 this.pageRoot.addClass("disable");
                 //get albums
                 var promiseAlbums = $.getJSON(this.root + "albums?userId=" + user.id);
                 var promisePhotos_1;
                 promiseAlbums.done(function (data) {
                     _this.albums = data;
+                    renderer_1.renderer.renderAlbumSwitcher(_this.albums);
                     //also get all the photos, this could be done in parallel to improve performance 
                     //but shouldnt be done at 2am because bad things could happen
                     // having promises.all would be sweet but es3 is shit
                     promisePhotos_1 = $.getJSON(_this.root + "photos?userId=" + user.id);
                     promisePhotos_1.done(function (photoData) {
                         _this.photos = photoData;
-                        renderer_1.renderer.renderAlbums(true);
+                        renderer_1.renderer.renderAlbum(_this.albums[0], _this.getPhotosForAlbum(_this.albums[0].id));
                     });
                 });
                 //posts
                 var promisePosts = $.getJSON(this.root + "posts?userId=" + user.id);
                 promisePosts.done(function (data) {
                     _this.posts = data;
-                    renderer_1.renderer.renderPosts();
+                    renderer_1.renderer.renderPosts(_this.posts);
                 });
                 $.when(promisePosts, promiseAlbums, promisePosts).done(function () { return _this.pageRoot.removeClass("disable"); });
             }
+        };
+        appManager.prototype.changeAlbum = function (album) {
+            renderer_1.renderer.renderAlbum(album, this.getPhotosForAlbum(album.id));
+        };
+        appManager.prototype.getPhotosForAlbum = function (albumId) {
+            return this.photos.filter(function (x) { return x.albumId === albumId; });
         };
         return appManager;
     }());

@@ -1,3 +1,5 @@
+/*general */
+
 .hidden {
     display: none;
 }
@@ -7,18 +9,54 @@ html, body, .anon-root, .auth-root, .root {
     height: 100%;
 }
 
-body {
-    font-size: 1em;
+.button {
+    display: inline-block;
+    position: relative;
+    width: 120px;
+    height: 32px;
+    line-height: 32px;
+    border: 1px solid lightgray;
+    border-radius: 2px;
+    font-size: 0.9em;
+    background-color: #fff;
+    color: #646464;
+}
+
+.button:hover {
+    background: whitesmoke;
+}
+
+.button.raised {
+    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    transition-delay: 0.2s;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
+}
+
+.card {
+    border: 1px solid lightgrey;
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-nav li {
+    cursor: pointer;
+}
+
+.navbar-brand {
+    font-size: 2em;
+}
+
+.root.small .navbar-brand {
+    display: none;
+}
+
+.ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 
-/*.auth-root {
-    position: absolute;
-    top: 6em;
-    bottom: 0;
-    left: 0;
-    right: 0;
-}*/
+/*end general*/
 
 .anon-root-internal {
     padding-top: 6em;
@@ -28,57 +66,37 @@ body {
     text-align: center;
 }
 
-.logo {
-    font-size: 3em;
-    position: absolute;
-    top: .5em;
-    width: 100%;
-}
-
-
-/*.login-form button {
-    display: block;
-    margin: 1em auto;
-}*/
-
-
-/*.auth-root {
-    width: 80%;
-    margin: 0 auto;
-}*/
-
 .label {
     font-size: 2em;
     margin: 1em 0;
 }
 
 .post-container {
-    margin: 1em;
+    display: inline-block;
+    margin: .5em;
     padding: .5em;
     text-align: left;
+    width: 30%;
 }
 
-.post-title:before {
-    content: "Title: ";
-    font-weight: bold;
+.small .post-container {
+    width: 90%;
 }
 
-.post-body:before {
-    content: "Body: ";
-    font-weight: bold;
+.post-title, .album-title {
+    border-bottom: 1px solid lightgray;
+    background-color: whitesmoke;
+    padding: .3em;
+    text-align: center;
 }
 
-
-/*.post-comments-button {
-    margin-top: 1em;
-}*/
-
-.album-title:before {
-    font-weight: bold;
-    content: "Album's title:";
+.post-comments-button {
+    margin: .5em auto;
+    display: block;
 }
 
 .album-title {
+    font-size: 2em;
     margin-bottom: 1em;
 }
 
@@ -99,28 +117,30 @@ body {
 }
 
 .album-container {
-    margin-top: 2em;
+    display: inline-block;
+    padding: 1em 2em;
 }
 
 .users .label {
     margin-bottom: .5em;
 }
 
-.post-comments-button {
-    margin-top: 1em;
+.user-switcher {
+    vertical-align: middle;
+    height: auto;
+    float: left;
+    padding: 10px;
+    margin: 5px;
 }
 
-.more-albums {
-    margin: 3em 0;
+.user-container, .album-switcher-container {
+    margin: 2em 0;
+    font-size: 1.5em;
 }
 
-.users .label {
-    margin-bottom: .5em;
-}
-
-.post-comment {
-    display: block;
-    margin: .5em auto 2em auto;
+.user-label, .album-switcher-label {
+    font-weight: bold;
+    margin: .5em;
 }
 
 .comment {
@@ -157,54 +177,16 @@ body {
     line-height: .5em;
 }
 
-
-/*.close-dialog:hover, button:hover {
-    cursor: pointer;
-    background: lightblue;
-}*/
+.post-comment, .form-group {
+    margin-left: 1em;
+}
 
 .comment-textarea {
-    width: 50%;
-    min-height: 10%;
+    width: 90%;
+    min-height: 20%;
 }
 
 .logout {
     display: block;
     margin: .5em auto;
-}
-
-.button {
-    display: inline-block;
-    position: relative;
-    width: 120px;
-    height: 32px;
-    line-height: 32px;
-    border: 0;
-    border-radius: 2px;
-    font-size: 0.9em;
-    background-color: #fff;
-    color: #646464;
-}
-
-.button:hover {
-    background: whitesmoke;
-}
-
-.button.raised {
-    transition: box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-    transition-delay: 0.2s;
-    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26);
-}
-
-.card {
-    border: 1px solid lightgrey;
-    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14), 0 1px 5px 0 rgba(0, 0, 0, 0.12), 0 3px 1px -2px rgba(0, 0, 0, 0.2);
-}
-
-.navbar-nav li {
-    cursor: pointer;
-}
-
-.navbar-brand {
-    font-size: 2em;
 }
