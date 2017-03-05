@@ -7,17 +7,25 @@
     <title>momentum</title>
     <link rel="stylesheet" href="dist/css/normalize.css">
     <link rel="stylesheet" href="dist/css/app.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/css/materialize.min.css">
 
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-shim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-sham.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.34.2/es6-shim.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.34.2/es6-sham.min.js"></script>
-    <script src="https://wzrd.in/standalone/es7-shim@latest"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-shim.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.5.7/es5-sham.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/json3/3.3.2/json3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.34.2/es6-shim.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.34.2/es6-sham.js"></script>
+    <script src="https://wzrd.in/standalone/es7-shim@latest"></script>
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.3/jquery.xdomainrequest.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.4.3/velocity.min.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>-->
+
+    <script src="scripts/require.js"></script>
     <script src="dist/polyfill.js"></script>
     <script src="dist/momentum.js"></script>
+    <script src="dist/bootstrapper.js"></script>
+
 </head>
 
 <body>
@@ -25,10 +33,10 @@
         <div class="logo">momentum</div>
         <div class="anon-root">
             <div class="anon-root-internal">
-                    <form class="login-form">
-                        <input type="text" class="login-input" placeholder="Enter your username" value="Bret" />
-                        <button type="submit">Login</button>
-                    </form>
+                <form class="login-form">
+                    <input type="text" class="login-input" placeholder="Enter your username" value="Bret" />
+                    <button class="btn" type="submit">Login</button>
+                </form>
             </div>
         </div>
 
@@ -36,7 +44,7 @@
             <div class="users">
                 <div class="label">Users</div>
                 <select class="user-switcher"></select>
-                <button class="logout" type="submit">Logout</button>
+                <button class="logout btn" type="submit">Logout</button>
             </div>
 
             <div class="label">Posts</div>
@@ -44,7 +52,7 @@
                 <div class="post-container">
                     <div class="post-title"></div>
                     <div class="post-body"></div>
-                    <button class="post-comments-button">See comments</button>
+                    <button class="post-comments-button btn">See comments</button>
                 </div>
             </div>
             <div class="label">Albums</div>
@@ -56,16 +64,16 @@
                             <img class="photo-image">
                         </div>
                     </div>
-                    <button class="more-photos">More photos</button>
+                    <button class="more-photos btn">More photos</button>
                 </div>
             </div>
-            <button class="more-albums">More albums</button>
+            <button class="more-albums btn">More albums</button>
         </div>
         <div class="dialog hidden">
             <div class="inner-dialog">
                 <div class="label">Comments</div>
                 <textarea class="comment-textarea"></textarea>
-                <button class="post-comment">Post</button>
+                <button class="post-comment btn">Post</button>
 
                 <div class="comment-container">
                     <div class="comment">
@@ -73,7 +81,7 @@
                         <div class="comment-body"></div>
                     </div>
                 </div>
-                <button class="close-dialog">x</button>
+                <button class="close-dialog btn">x</button>
             </div>
         </div>
     </div>
