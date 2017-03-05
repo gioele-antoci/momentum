@@ -240,10 +240,8 @@ define("appManager", ["require", "exports", "renderer", "dialog", "pageSwitcher"
             this.authRoot = $(".auth-root");
             this.form = $(".login-form");
             this.input = $(".login-input");
-            this.logoutButton = $(".logout");
-            this.logoutButton.click(function (e) {
-                _this.logout();
-            });
+            this.logoutButton = $(".nav-logout");
+            this.logoutButton.click(function (e) { return _this.logout(); });
             this.form.on("submit", function (e) {
                 e.preventDefault();
                 _this.login(_this.input.val());

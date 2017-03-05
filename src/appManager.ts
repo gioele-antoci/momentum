@@ -41,11 +41,9 @@ export class appManager implements manager {
         this.authRoot = $(".auth-root");
         this.form = $(".login-form");
         this.input = $(".login-input");
-        this.logoutButton = $(".logout");
+        this.logoutButton = $(".nav-logout");
 
-        this.logoutButton.click(e => {
-            this.logout();
-        });
+        this.logoutButton.click(e => this.logout());
 
         this.form.on("submit", e => {
             e.preventDefault();
