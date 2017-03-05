@@ -45,6 +45,7 @@ export class renderer {
     }
 
     static renderAlbum(album: album, albumPhotos: photo[]) {
+        albumsContainer.empty();
 
         //set album title
         const albumEl = albumContainer.clone();
@@ -77,7 +78,7 @@ export class renderer {
             const photoEl = photoElTemplate.clone();
             //add image
             const photoImage = $(".photo-image", photoEl);
-            photoImage.attr("src", photo.url).attr("title", photo.title);
+            photoImage.attr("src", photo.url.replace("http://", `${document.location.protocol}//`)).attr("title", photo.title);
             //add caption
             const photoCaption = $(".carousel-caption", photoEl);
             photoCaption.text(photo.title);

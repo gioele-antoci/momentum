@@ -113,6 +113,7 @@ define("renderer", ["require", "exports", "dialog"], function (require, exports,
             albums.forEach(function (album) { return albumSwitcher.append($("<option></option>").attr("value", album.id).text(album.title)); });
         };
         renderer.renderAlbum = function (album, albumPhotos) {
+            albumsContainer.empty();
             //set album title
             var albumEl = albumContainer.clone();
             albumEl.append(albumTitle.clone().text(album.title));
@@ -137,7 +138,7 @@ define("renderer", ["require", "exports", "dialog"], function (require, exports,
                 var photoEl = photoElTemplate.clone();
                 //add image
                 var photoImage = $(".photo-image", photoEl);
-                photoImage.attr("src", photo.url).attr("title", photo.title);
+                photoImage.attr("src", photo.url.replace("http://", document.location.protocol + "//")).attr("title", photo.title);
                 //add caption
                 var photoCaption = $(".carousel-caption", photoEl);
                 photoCaption.text(photo.title);
