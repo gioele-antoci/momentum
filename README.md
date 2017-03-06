@@ -2,6 +2,12 @@
 
 ### TL;DR ES3 can cause serious pain to whomever has to support it: [WEBSITE](https://gioele-antoci.github.io/momentum) 
 
+## *EDIT (03/05/2017 @ 9:29pm)
+A misundersting happened. I thought I needed to deliver this before friday afternoon and that lead to a specific set of decisions when it came to crush this test. After a saturday morning clarification, I started working on _momentum_ again. I was now challenged with one of the harderst decision a web dev/product manager has to make. Refactoring or starting over from scratch? Turns out I could actually use `Angular 1.x` and `shims` but I already have working code that is somewhat tested.    
+I decided to improve the existing code adding modularity (provided by compiling TS to `AMD` modules + `requirejs`), making it overall more elegant and adding more comments. In addition brand new code needed to be written to support a slickier UI. That took most of the time spent on this refactoring. I ended using `Bootstrap 3.0` even though `mdl` from Google was my prefered choice (unfortunately no `IE8` support). Used a static `carousel` to display albums' pictures (in order to improve page performances I decided to limit to one album at the time). Replaced my rudimentary modal with Boostrap's, added a fixed header. Added a splash screen to welcome the user.    
+Like I say almost weekly to my mom, _a software app will never be done_. There is lot of room for improvement that I am eager to discuss when we will meet again.
+
+
 ## What I wanted to do
 Build a fast, clean, **react app**. I wanted to do this to showcase my skills with a recent, modern framework but also because it's what makes the most sense. When I read the specifics on my way home I thought this was gonna take me a couple of hours. That was until I read the `es3` requirement.   
 Naive me thought I could get away with workarounds. Namely `es5shims` + `es5shams` (more [here](https://github.com/es-shims/es5-shim)) . Or create a react app, take that bundle and pass it through a **transpiler** (Traceur? Babel?).    
