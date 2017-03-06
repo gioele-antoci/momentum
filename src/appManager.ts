@@ -97,7 +97,6 @@ export class appManager implements manager {
     private autologin(): void {
         const localUser: user = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"));
         this.checkAuthentication(localUser ? localUser.username : null);
-
     }
 
     checkAuthentication(username = ""): void {
@@ -120,6 +119,7 @@ export class appManager implements manager {
             this.input.addClass("validation-error");
         }
 
+        this.pageRoot.toggleClass("auth", !!user);
         this.anonRoot.toggleClass("hidden", !!user);
         this.authRoot.toggleClass("hidden", !user);
     }

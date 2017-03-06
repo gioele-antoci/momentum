@@ -9,6 +9,14 @@ html, body, .anon-root, .auth-root, .root {
     height: 100%;
 }
 
+body {
+    padding: 0;
+}
+
+.root.auth {
+    padding-top: 50px;
+}
+
 .button {
     display: inline-block;
     position: relative;

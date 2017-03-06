@@ -6,10 +6,12 @@
     "local-web-server": "^1.2.6",
     "typescript": "^2.2.1",
     "@types/jquery": "^2.0.40",
-    "@types/velocity-animate": "^1.2.29"
+    "@types/velocity-animate": "^1.2.29",
+    "uglify-js": "^2.8.7"
   },
   "dependencies": {},
   "scripts": {
-    "start": "ws"
+    "start": "ws",  
+    "deploy": "uglifyjs dist/momentum.js --mangle --compress --support-ie8 -o dist/momentum.js"
   }
 }
