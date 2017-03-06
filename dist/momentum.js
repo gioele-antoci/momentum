@@ -293,7 +293,7 @@ define("appManager", ["require", "exports", "renderer", "dialog", "pageSwitcher"
         };
         appManager.prototype.autologin = function () {
             var localUser = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"));
-            this.checkAuthentication(localUser || null);
+            this.checkAuthentication(localUser ? localUser.username : null);
         };
         appManager.prototype.checkAuthentication = function (username) {
             if (username === void 0) { username = ""; }

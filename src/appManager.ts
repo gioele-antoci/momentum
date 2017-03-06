@@ -95,8 +95,8 @@ export class appManager implements manager {
     }
 
     private autologin(): void {
-        const localUser = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"));
-        this.checkAuthentication(localUser || null);
+        const localUser: user = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"));
+        this.checkAuthentication(localUser ? localUser.username : null);
 
     }
 
