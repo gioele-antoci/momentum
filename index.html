@@ -1,8 +1,11 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="utf-8">
+    <meta name="keywords" content="momentum,test,Typescript,JavaScript">
+    <meta name="author" content="Gioele Antoci">
+    <meta name="description" content="Front end dev aptitude test for momentum!">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>momentum</title>
     <link rel="stylesheet" href="dist/css/normalize.css">
@@ -25,22 +28,27 @@
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <!--[if IE]>
     <script src="//cdnjs.cloudflare.com/ajax/libs/jquery-ajaxtransport-xdomainrequest/1.0.3/jquery.xdomainrequest.min.js"></script>
-    <script src="//cdnjs.cloudflare.com/ajax/libs/velocity/1.4.3/velocity.min.js"></script>
-    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.98.0/js/materialize.min.js"></script>-->
-
+<![endif]-->
     <script src="scripts/require.js"></script>
     <script src="dist/momentum.js"></script>
     <script src="dist/bootstrapper.js"></script>
-
 </head>
 
 <body>
     <div class="root">
         <!--anon view-->
-        <div class="anon-root">
+        <div class="anon-root hidden">
+            <video class="momentum-video" autoplay="autoplay" muted loop poster="resources/momentum.jpg">
+                <source src="resources/momentum.mp4" type="video/mp4" />
+                <img src="resources/momentum.jpg" alt="momentum" />
+            </video>
+
             <div class="anon-root-internal">
                 <form class="login-form">
+                    <div class="logo">momentum</div>
+
                     <input type="text" class="login-input" placeholder="Enter your username" value="Bret" />
                     <button class="button raised" type="submit">Login</button>
                 </form>
@@ -84,7 +92,7 @@
                                 <div class="post-container card">
                                     <div class="post-title ellipsis"></div>
                                     <div class="post-body"></div>
-                                    <button class="post-comments-button button raised">Comments</button>
+                                    <button class="post-comments-button button raised">COMMENTS</button>
                                 </div>
                             </div>
                         </div>
@@ -112,7 +120,6 @@
                                             <span class="sr-only">Next</span>
                                         </a>
                                     </div>
-                                    <!--<button class="more-photos button raised">More photos</button>-->
                                 </div>
                             </div>
                         </div>
@@ -122,22 +129,26 @@
         </div>
         <!--END auth view -->
     </div>
+
+    <div class="progress-momentum">
+        <div class="progress-momentum-inner">Loading...</div>
+    </div>
     <!--dialog-->
     <div class="dialog modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
         <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">COMMENTS</h4>
+                    <h4 class="modal-title" id="myModalLabel">Comments</h4>
                     <div class="modal-body">
 
                         <div class="form-group">
                             <label for="message-text" class="control-label">Add a new comment:</label>
-                            <textarea class="form-control comment-textarea" id="message-text"></textarea>
+                            <textarea class="form-control comment-textarea" id="message-text" placeholder="Add a comment"></textarea>
                         </div> <button class="post-comment button raised">ADD</button>
 
                         <div class="comment-container">
-                            <div class="comment">
+                            <div class="comment card">
                                 <div class="comment-author"></div>
                                 <div class="comment-body"></div>
                             </div>

@@ -103,7 +103,8 @@ export class renderer {
 
     static openComments(postId: number) {
         dialog.renderComments(postId);
-        dialog.openDialog();
+        // dom breather
+        setTimeout(() => dialog.openDialog());
     }
 }
 

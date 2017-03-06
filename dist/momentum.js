@@ -29,9 +29,16 @@ define("dialog", ["require", "exports"], function (require, exports) {
         dialog.commentAuthor = $(".comment-author").detach();
         dialog.commentEl = $(".comment").detach();
         dialog.postButton.click(function (e) {
+            var val = dialog.textarea.val();
+            dialog.textarea.toggleClass("validation-error", !val);
+            if (!val) {
+                dialog.textarea.attr("placeholder", "Please enter a comment");
+                return;
+            }
+            dialog.textarea.attr("placeholder", "Add a comment");
             var comm = {
                 postId: dialog.postId,
-                body: dialog.textarea.val(),
+                body: val,
                 email: dialog.manager.authUser.email,
                 name: "This is a comment name"
             };
@@ -159,7 +166,8 @@ define("renderer", ["require", "exports", "dialog"], function (require, exports,
         };
         renderer.openComments = function (postId) {
             dialog_1["default"].renderComments(postId);
-            dialog_1["default"].openDialog();
+            // dom breather
+            setTimeout(function () { return dialog_1["default"].openDialog(); });
         };
         return renderer;
     }());
@@ -241,10 +249,11 @@ define("appManager", ["require", "exports", "renderer", "dialog", "pageSwitcher"
             this.form = $(".login-form");
             this.input = $(".login-input");
             this.logoutButton = $(".nav-logout");
+            this.progress = $(".progress-momentum");
             this.logoutButton.click(function (e) { return _this.logout(); });
             this.form.on("submit", function (e) {
                 e.preventDefault();
-                _this.login(_this.input.val());
+                _this.checkAuthentication(_this.input.val());
             });
             this.userSwitcher = $(".user-switcher");
             this.userSwitcher.on("change", function (e) {
@@ -256,52 +265,69 @@ define("appManager", ["require", "exports", "renderer", "dialog", "pageSwitcher"
                 var id = e.target.value;
                 _this.changeAlbum(_this.albums.filter(function (x) { return x.id === parseInt(id); })[0]);
             });
+            var checkWidth = function () {
+                var width = $(window).width();
+                _this.pageRoot.toggleClass("small", width < 768);
+                setTimeout(function () { return resizeListener(); }, 100); //rebinds itself after 100ms;
+            };
             var resizeListener = function () {
                 $(window).one("resize", function () {
-                    var width = $(window).width();
-                    _this.pageRoot.toggleClass("small", width < 768);
-                    setTimeout(function () { return resizeListener(); }, 100); //rebinds itself after 100ms
+                    checkWidth();
                 });
             };
             resizeListener();
+            checkWidth();
+        };
+        appManager.prototype.toggleSpinner = function (visible) {
+            this.progress.toggleClass("hidden", !visible);
         };
         appManager.prototype.requestUsers = function () {
             var _this = this;
+            this.toggleSpinner(true);
             var promise = $.getJSON(this.root + "users");
             promise.done(function (data) {
                 _this.users = data;
+                _this.toggleSpinner(false);
             });
             return promise;
         };
         appManager.prototype.autologin = function () {
             var localUser = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"));
-            if (localUser) {
-                this.login(localUser.username);
-            }
+            this.checkAuthentication(localUser || null);
         };
-        appManager.prototype.login = function (username) {
+        appManager.prototype.checkAuthentication = function (username) {
+            if (username === void 0) { username = ""; }
+            var user = null;
             if (username) {
-                var user = this.users.filter(function (x) { return x.username === username; })[0];
+                user = this.users.filter(function (x) { return x.username === username; })[0];
                 if (user) {
                     localStorage.setItem("user", JSON.stringify(user));
-                    this.anonRoot.addClass("hidden");
-                    this.authRoot.removeClass("hidden");
                     this.authUser = user;
                     this.changeUser(user);
+                    this.input.removeClass("validation-error");
+                    this.input.attr("placeholder", "Enter your username");
+                }
+                else {
+                    this.input.addClass("validation-error");
+                    this.input.attr("placeholder", "Username not found");
                 }
             }
+            else if (username !== null) {
+                this.input.addClass("validation-error");
+            }
+            this.anonRoot.toggleClass("hidden", !!user);
+            this.authRoot.toggleClass("hidden", !user);
         };
         appManager.prototype.logout = function () {
             localStorage.removeItem("user");
-            this.anonRoot.removeClass("hidden");
-            this.authRoot.addClass("hidden");
+            this.checkAuthentication();
         };
         appManager.prototype.changeUser = function (user) {
             var _this = this;
             if (user) {
                 //reset
                 this.userSwitcher.val(user.id);
-                this.pageRoot.addClass("disable");
+                this.toggleSpinner(true);
                 //get albums
                 var promiseAlbums = $.getJSON(this.root + "albums?userId=" + user.id);
                 var promisePhotos_1;
@@ -323,7 +349,7 @@ define("appManager", ["require", "exports", "renderer", "dialog", "pageSwitcher"
                     _this.posts = data;
                     renderer_1.renderer.renderPosts(_this.posts);
                 });
-                $.when(promisePosts, promiseAlbums, promisePosts).done(function () { return _this.pageRoot.removeClass("disable"); });
+                $.when(promisePosts, promiseAlbums, promisePosts).done(function () { return _this.toggleSpinner(false); });
             }
         };
         appManager.prototype.changeAlbum = function (album) {

@@ -32,7 +32,7 @@ html, body, .anon-root, .auth-root, .root {
 }
 
 .button:hover {
-    background: whitesmoke;
+    background: #009688;
 }
 
 .button.raised {
@@ -68,15 +68,81 @@ html, body, .anon-root, .auth-root, .root {
     border: 0;
 }
 
+.validation-error {
+    border: 2px dotted red;
+}
+
 
 /*end general*/
 
+.logo {
+    font-size: 1.5em;
+    color: white;
+}
+
+.progress-momentum {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    font-size: 2em;
+    background: white;
+}
+
+.progress-momentum-inner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 5em;
+    height: 2em;
+    margin-left: -2.5em;
+    margin-top: -0.5em;
+}
+
+.anon-root {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+}
+
+.anon-root-internal button {
+    display: block;
+    margin: 1em auto 0 auto;
+    border: 0;
+    line-height: 1em;
+}
+
 .anon-root-internal {
-    padding-top: 6em;
+    position: absolute;
+    right: 10%;
+    top: 10%;
+    font-size: 2em;
+    text-align: center;
+}
+
+.root.small .anon-root-internal {
+    font-size: 2em;
+    top: 10%;
+    margin: 0 auto;
+    text-align: center;
+    width: 90%;
+    left: 5%;
+    right: 5%;
+}
+
+.momentum-video {
+    width: 100%;
+    height: 100%;
+    object-fit: inherit;
 }
 
 .root {
     text-align: center;
+    position: relative;
 }
 
 .label {
@@ -86,7 +152,8 @@ html, body, .anon-root, .auth-root, .root {
 
 .post-container {
     display: inline-block;
-    margin: .5em;
+    vertical-align: text-top;
+    margin: 1.5em 1em;
     padding: .5em;
     text-align: left;
     width: 30%;
@@ -101,6 +168,7 @@ html, body, .anon-root, .auth-root, .root {
     background-color: whitesmoke;
     padding: .3em;
     text-align: center;
+    font-weight: bold;
 }
 
 .post-comments-button {
@@ -159,7 +227,6 @@ html, body, .anon-root, .auth-root, .root {
 .comment {
     padding: 1em;
     margin: 1em;
-    border: 1px solid lightgray;
     text-align: left;
     word-wrap: break-word;
 }

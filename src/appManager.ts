@@ -22,6 +22,8 @@ export class appManager implements manager {
     userSwitcher: JQuery;
     albumSwitcher: JQuery;
 
+    progress: JQuery;
+
     constructor() {
         $(document).ready(() => {
             this.setup();
@@ -42,12 +44,12 @@ export class appManager implements manager {
         this.form = $(".login-form");
         this.input = $(".login-input");
         this.logoutButton = $(".nav-logout");
-
+        this.progress = $(".progress-momentum");
         this.logoutButton.click(e => this.logout());
 
         this.form.on("submit", e => {
             e.preventDefault();
-            this.login(this.input.val());
+            this.checkAuthentication(this.input.val());
         });
 
         this.userSwitcher = $(".user-switcher");
@@ -62,21 +64,31 @@ export class appManager implements manager {
             this.changeAlbum(this.albums.filter(x => x.id === parseInt(id))[0]);
         });
 
+        const checkWidth = () => {
+            const width = $(window).width();
+            this.pageRoot.toggleClass("small", width < 768);
+            setTimeout(() => resizeListener(), 100); //rebinds itself after 100ms;
+        };
+
         const resizeListener = () => {
             $(window).one("resize", () => {
-                const width = $(window).width();
-                this.pageRoot.toggleClass("small", width < 768);
-                setTimeout(() => resizeListener(), 100); //rebinds itself after 100ms
+                checkWidth();
             });
-        }
-
+        };
         resizeListener();
+        checkWidth();
+    }
+
+    private toggleSpinner(visible: boolean): void {
+        this.progress.toggleClass("hidden", !visible);
     }
 
     private requestUsers(): JQueryXHR {
+        this.toggleSpinner(true);
         const promise = $.getJSON(`${this.root}users`);
         promise.done(data => {
             this.users = data;
+            this.toggleSpinner(false);
         });
 
         return promise;
@@ -84,37 +96,45 @@ export class appManager implements manager {
 
     private autologin(): void {
         const localUser = localStorage.getItem("user") && JSON.parse(localStorage.getItem("user"));
-        if (localUser) {
-            this.login(localUser.username);
-        }
+        this.checkAuthentication(localUser || null);
+
     }
 
-    login(username: string): void {
+    checkAuthentication(username = ""): void {
+        let user = null;
         if (username) {
-            const user = this.users.filter(x => x.username === username)[0];
+            user = this.users.filter(x => x.username === username)[0];
             if (user) {
                 localStorage.setItem("user", JSON.stringify(user));
-                this.anonRoot.addClass("hidden");
-                this.authRoot.removeClass("hidden");
-
                 this.authUser = user;
                 this.changeUser(user);
+                this.input.removeClass("validation-error");
+                this.input.attr("placeholder", "Enter your username");
+            }
+            else {
+                this.input.addClass("validation-error");
+                this.input.attr("placeholder", "Username not found");
             }
         }
+        else if (username !== null) {
+            this.input.addClass("validation-error");
+        }
+        
+        this.anonRoot.toggleClass("hidden", !!user);
+        this.authRoot.toggleClass("hidden", !user);
     }
 
     logout(): void {
         localStorage.removeItem("user");
-
-        this.anonRoot.removeClass("hidden");
-        this.authRoot.addClass("hidden");
+        this.checkAuthentication();
     }
 
     changeUser(user: user): void {
         if (user) {
             //reset
             this.userSwitcher.val(user.id);
-            this.pageRoot.addClass("disable");
+
+            this.toggleSpinner(true);
 
             //get albums
             const promiseAlbums = $.getJSON(`${this.root}albums?userId=${user.id}`);
@@ -141,7 +161,7 @@ export class appManager implements manager {
                 renderer.renderPosts(this.posts);
             });
 
-            $.when(promisePosts, promiseAlbums, promisePosts).done(() => this.pageRoot.removeClass("disable"));
+            $.when(promisePosts, promiseAlbums, promisePosts).done(() => this.toggleSpinner(false));
         }
 
 

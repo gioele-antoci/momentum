@@ -27,9 +27,18 @@ export default class dialog {
         dialog.commentEl = $(".comment").detach();
 
         dialog.postButton.click(e => {
+            const val = dialog.textarea.val();
+            dialog.textarea.toggleClass("validation-error", !val);
+            if (!val) {
+                dialog.textarea.attr("placeholder", "Please enter a comment");
+                return;
+            }
+
+            dialog.textarea.attr("placeholder", "Add a comment");
+
             const comm: comment = {
                 postId: dialog.postId,
-                body: dialog.textarea.val(),
+                body: val,
                 email: dialog.manager.authUser.email,
                 name: "This is a comment name"
             };
