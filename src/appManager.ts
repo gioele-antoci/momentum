@@ -119,14 +119,14 @@ export class appManager implements manager {
         else if (username !== null) {
             this.input.addClass("validation-error");
         }
-        
+
         this.anonRoot.toggleClass("hidden", !!user);
         this.authRoot.toggleClass("hidden", !user);
     }
 
     logout(): void {
         localStorage.removeItem("user");
-        this.checkAuthentication();
+        this.checkAuthentication(null);
     }
 
     changeUser(user: user): void {

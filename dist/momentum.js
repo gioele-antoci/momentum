@@ -320,7 +320,7 @@ define("appManager", ["require", "exports", "renderer", "dialog", "pageSwitcher"
         };
         appManager.prototype.logout = function () {
             localStorage.removeItem("user");
-            this.checkAuthentication();
+            this.checkAuthentication(null);
         };
         appManager.prototype.changeUser = function (user) {
             var _this = this;
