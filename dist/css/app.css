@@ -197,7 +197,6 @@ body {
 .photo-container {
     border: 1px solid lightgray;
     padding: .5em;
-    display: inline-block;
 }
 
 .more-photos {
@@ -206,7 +205,6 @@ body {
 }
 
 .album-container {
-    display: inline-block;
     padding: 1em 2em;
 }
 
